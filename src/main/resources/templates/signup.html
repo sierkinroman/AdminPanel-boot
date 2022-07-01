@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Sign up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/signup.css}" type="text/css">
+</head>
+<body>  
+    <div class="form_wrapper">
+        <form th:action="@{/signup}" method="POST" th:object="${userSignupDto}" class="form">
+            <p class="form_title">Sign up</p>
+            <p class="text_form">Username:</p>
+            <input type="text" name="username" th:field="*{username}" autofocus class="input_form">
+            <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="invalid_field"></p>
+            
+            <p class="text_form">Password:</p>
+            <input type="password" name="password" id="password" th:value="*{password}" class="input_form">
+            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="invalid_field"></p>
+            
+            <p class="text_form">Confirm password:</p>
+            <input type="password" name="confirmPassword" id="confirmPassword" th:value="*{confirmPassword}" class="input_form">
+            <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="invalid_field"></p>
+            
+            <p class="text_form">E-mail:</p>
+            <input type="text" name="email" th:field="*{email}" class="input_form">
+            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="invalid_field"></p>
+            
+            <p class="text_form">First name:</p>
+            <input type="text" name="firstName" th:field="*{firstName}" class="input_form">
+            <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="invalid_field"></p>
+            
+            <p class="text_form">Last name:</p>
+            <input type="text" name="lastName" th:field="*{lastName}" class="input_form">
+            <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="invalid_field"></p>
+                
+            <!--  
+            <p th:if="${errorRegister}" th:text="${errorMessage}" class="invalid_field">*Login is used</p>
+            -->
+            
+            <input type="submit" value="SIGN UP" class="button_form">
+            
+            <p class="message">Registered? <a th:href="@{/login}">Log in</a></p>
+        </form>
+    </div>
+
+</body>
+</html>

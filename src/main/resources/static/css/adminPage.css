@@ -1,0 +1,202 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: linear-gradient( to right, #D7D9A3, #5DA6A6, #CACEB5);
+    background-size: 400% 400%;
+    animation: body 25s infinite ease-in-out;
+    color: rgb(56, 56, 56);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+}
+
+@keyframes body {
+    0%{
+        background-position: 0 50%;
+    }
+    50%{
+        background-position: 100% 50%;
+    }
+    1000%{
+        background-position: 0 50%;
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: right;
+    padding: 0 70px 0 10px;
+    line-height: 67px;
+    font-size: 18px;
+    background-color: rgba(250, 250, 250, 0.6);
+    box-shadow: 0 0 20px 0 rgb(0 0 0 / 20%), 0 5px 5px 0 rgb(0 0 0 / 24%);
+}
+
+.header p {
+    font-weight: 400;
+    margin: 0 50px 0 0;
+}
+
+.header form input[type="submit"],
+.header a {
+    all: unset;
+    color: rgb(45, 69, 179);
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 400;
+}
+
+.header form input[type="submit"]:hover,
+.header a:hover {
+    color: rgb(15, 34, 117);
+    text-shadow: 0 0 1px rgb(15, 34, 117), 0 0 1px rgb(15, 34, 117);
+}
+
+.header a {
+    margin: 0 50px 0 0;
+}
+
+.table_title {
+    text-align: center;
+    margin: 50px 10px 0 10px;
+    font-weight: 400;
+}
+
+.table {
+    border: 2px solid rgb(56, 56, 56);
+    border-spacing: 0;
+    width: calc(100% - 40px);
+    margin: 20px auto;
+}
+
+.table_header {
+    padding: 5px 10px;
+    border-right: 2px solid rgb(56, 56, 56);
+    border-bottom: 2px solid rgb(56, 56, 56);
+    background-color: #dfe0c0;
+}
+
+.table_header:last-child {
+    border-right: none;
+}
+
+.cell {
+    padding: 5px 10px;
+    border-right: 2px solid rgb(56, 56, 56);
+    font-weight: 400;
+}
+
+.cell:last-child {
+    border-right: none;
+}
+
+.cell span:last-child {
+	display: none;
+}
+
+.cell a{
+    color: rgb(56, 56, 56);
+    border-radius: 5px;
+    padding: 0 10px;
+    margin: 0 5px 0 0;
+    line-height: 26px;
+    display: block;
+    float: left;
+    background-color: #f9fc70;
+    text-decoration: none;
+}
+
+.cell a:hover{
+    background-color: #d7da5c;
+}
+
+.cell .deleteBtn {
+    all: unset;
+    cursor: pointer;
+    color: rgb(56, 56, 56);
+    border-radius: 5px;
+    padding: 0 10px;
+    line-height: 26px;
+    background-color: #ff8383;
+    font-weight: 400;
+}
+
+.cell .deleteBtn:hover {
+    background-color: #d87070;
+}
+
+tr {
+    background-color: rgba(250, 250, 250, 0.6);
+}
+
+tr:nth-child(2n + 3) {
+    background-color: rgba(230, 227, 227, 0.6);
+}
+
+#modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    background-color: rgba(61, 60, 60, 0.6);
+    cursor: pointer;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.modal_block {
+    position: relative;
+    padding: 50px 50px;
+    margin: auto;
+    background-color: rgb(250, 246, 246);
+    cursor: default;
+    border: 1px solid #646464;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.modal_block p {
+    font-size: 24px;
+    margin: 0 0 30px 0;
+}
+
+.buttons {
+    display: flex;
+}
+
+.modal_btn {
+    all: unset;
+    border-radius: 4px;
+    width: 100px;
+    cursor: pointer;
+    line-height: 50px;
+    font-size: 24px;
+    background-color: rgb(230, 230, 230);;
+}
+
+.modal_btn:hover {
+    background-color: rgb(202, 200, 200);
+}
+
+.modal_yesBtn {
+    background-color: #90d4c6;
+    margin: 0 0 0 24px;
+}
+
+.modal_yesBtn:hover {
+    background-color: #7ab4aa;;
+}
+
+.modal_close {
+    all: unset;
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+	height: 24px;
+	display: flex;
+    justify-content: center;
+    align-items: center;
+}
