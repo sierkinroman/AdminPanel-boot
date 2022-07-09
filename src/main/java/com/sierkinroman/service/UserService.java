@@ -2,10 +2,9 @@ package com.sierkinroman.service;
 
 import java.util.Set;
 
-import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
 
 import com.sierkinroman.entities.User;
-import com.sierkinroman.exception.ResourceNotFoundException;
 
 public interface UserService {
 	
@@ -17,23 +16,12 @@ public interface UserService {
 	
 	Set<User> findAll();
 	
+	Page<User> findPaginated(int pageNum, int pageSize);
+	
 	User save(User user);
 	
 	void update(User user);
 	
 	void deleteById(long id);
 
-//	User findById(long id) throws ResourceNotFoundException;
-//	
-//	User findByUsername(String username) throws ResourceNotFoundException;
-//	
-//	User findByEmail(String email) throws ResourceNotFoundException;
-//	
-//	Set<User> findAll();
-//	
-//	User save(User user);
-//	
-//	void update(User user) throws ResourceNotFoundException;
-//	
-//	void deleteById(long id) throws ResourceNotFoundException;
 }

@@ -48,6 +48,19 @@
             </td>
         </tr>      
     </table>
+    
+    <div class="pagination">
+        <a th:if="${currentPage > 1}" th:href="@{/admin/users/1}" class="page_link">&lt;&lt;</a>
+        <a th:if="${currentPage > 1}" th:href="@{'/admin/users/' + ${currentPage - 1}}" class="page_link">&lt;</a>
+
+		<th:block th:each="i: ${#numbers.sequence(1, totalPages)}">
+			<a th:if="${currentPage != i}" th:href="@{'/admin/users/' + ${i}}" th:text="${i}" class="page_link"></a>
+			<span th:if="${currentPage == i}" th:text="${i}" class="page_link current_page"></span>
+		</th:block>
+
+        <a th:if="${currentPage < totalPages}" th:href="@{'/admin/users/' + ${currentPage + 1}}" class="page_link">&gt;</a>
+        <a th:if="${currentPage < totalPages}" th:href="@{'/admin/users/' + ${totalPages}}" class="page_link">&gt;&gt;</a>
+    </div>
 
     <div id="modal">
         <div class="modal_block">
@@ -67,10 +80,10 @@
         </div>
     </div>
     
-    <script th:src="@{js/jquery-3.6.0.min.js}"></script>
-    <script th:src="@{js/index.js}"></script>
-    <script th:src="@{js/toastr/toastr.min.js}"></script>
-	<script th:src="@{js/toastr/toastrConfig.js}"></script> 
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/index.js}"></script>
+    <script th:src="@{/js/toastr/toastr.min.js}"></script>
+	<script th:src="@{/js/toastr/toastrConfig.js}"></script> 
 	<script th:inline="javascript">
 	    $(document).ready(function () {
 	        var action = /*[[${action}]]*/ '';

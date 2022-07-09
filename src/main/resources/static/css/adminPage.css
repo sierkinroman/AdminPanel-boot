@@ -1,6 +1,7 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 body {
@@ -68,7 +69,7 @@ body {
     border: 2px solid rgb(56, 56, 56);
     border-spacing: 0;
     width: calc(100% - 40px);
-    margin: 20px auto;
+    margin: 40px auto;
 }
 
 .table_header {
@@ -133,6 +134,41 @@ tr {
 
 tr:nth-child(2n + 3) {
     background-color: rgba(230, 227, 227, 0.6);
+}
+
+.pagination {
+    text-align: center; 
+    display: flex;
+    justify-content: center;
+    margin: 0 20px 20px 20px;
+}
+
+.pagination .page_link {
+    display: block;
+    text-decoration: none;
+    background-color: rgba(250, 250, 250, 0.6);
+    color: rgb(56, 56, 56);
+    font-weight: 400;
+    padding: 4px 6px;
+    min-width: 35px;
+    margin: 0 3px;
+    font-size: 14px;
+}
+
+.pagination .page_link:hover {
+    background-color: #3c6d8a; 
+    color: #f3f4f2;
+}
+
+.pagination .current_page {
+    background-color: #16425b; 
+    border-radius: 4px;
+    color: #f3f4f2;
+    cursor: default;
+}
+
+.pagination .current_page:hover {
+    background-color: #16425b; 
 }
 
 #modal {

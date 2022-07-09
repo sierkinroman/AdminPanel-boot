@@ -38,7 +38,7 @@ public class DataLoader {
 				  Collections.singleton(roleService.findByName("ROLE_ADMIN")));
 		
 		Set<Role> roleUser = Collections.singleton(roleService.findByName("ROLE_USER"));
-		int countUser = 10;
+		int countUser = 50;
 		for (int i = 1; i <= countUser; i++) {
 			createUserIfNotExists("user" + i,
 								  "user" + i,

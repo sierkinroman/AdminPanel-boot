@@ -18,7 +18,7 @@
         <p>
         	Hi, <span th:text="${loginedUser.username}">user</span>
         </p>
-        <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin}">Admin page</a>
+        <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/users/1}">Admin page</a>
         <form th:action="@{/logout}" method="POST">
             <input type="submit" value="Log out"/>
         </form>
@@ -62,10 +62,10 @@
         </div>
     </div>
     
-    <script th:src="@{js/jquery-3.6.0.min.js}"></script>
-    <script th:src="@{js/index.js}"></script>
-    <script th:src="@{js/toastr/toastr.min.js}"></script>
-	<script th:src="@{js/toastr/toastrConfig.js}"></script> 
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/index.js}"></script>
+    <script th:src="@{/js/toastr/toastr.min.js}"></script>
+	<script th:src="@{/js/toastr/toastrConfig.js}"></script> 
 	<script th:inline="javascript">
 	    $(document).ready(function () {
 	        var action = /*[[${action}]]*/ '';

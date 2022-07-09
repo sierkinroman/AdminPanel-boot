@@ -33,14 +33,15 @@ public class UserController {
 	
 	// TODO 403 404 401 page handler (if user go to /admin etc).
 	// TODO change color and transparent in toastr
+	// TODO if Admin change role to User he can't visit adminPage
 	
 	private String previousPage = "/";
 	
 	@Autowired
-	UserService userService;
+	private UserService userService;
 	
 	@Autowired
-	RoleService roleService;
+	private RoleService roleService;
 	
 	@GetMapping(value = {"/admin/{id}/edit", "/user/edit"})
 	public String showEditForm(@PathVariable Optional<Long> id, Model model, 
@@ -84,15 +85,6 @@ public class UserController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("listRoles", roleService.findAll());
 			return "userEdit";
-		} else {
-//			User updatedUser = userService.findById(userId);
-//			updatedUser.setEmail(userEditDto.getEmail());
-//			updatedUser.setFirstName(userEditDto.getFirstName());
-//			updatedUser.setLastName(userEditDto.getLastName());
-//			if (authUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-//				updatedUser.setRoles(userEditDto.getRoles());
-//			}
-//			userService.update(updatedUser);
 		}
 		
 		User updatedUser = userService.findById(userId);
@@ -114,12 +106,13 @@ public class UserController {
 			return authUser.getId();
 		});
 		
+		previousPage = request.getHeader("Referer");
+		previousPage = previousPage != null ? previousPage : "/";
+		
 		if (userId == authUser.getId()) {
 			if (authUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")) 
 					&& roleService.findByName("ROLE_ADMIN").getUsers().size() == 1) {
 				redirectAttributes.addFlashAttribute("action", "lastAdminInvalidDelete");
-				previousPage = request.getHeader("Referer");
-				previousPage = previousPage != null ? previousPage : "/";
 				return "redirect:" + previousPage;
 			}
 		}
@@ -135,7 +128,7 @@ public class UserController {
 		}
 		
 		redirectAttributes.addFlashAttribute("action", "successDelete");
-		return "redirect:/admin";
+		return "redirect:" + previousPage;
 	}
 	
 }
