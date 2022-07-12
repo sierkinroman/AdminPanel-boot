@@ -1,5 +1,7 @@
 package com.sierkinroman.controller;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
@@ -9,6 +11,9 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,7 +38,7 @@ public class UserController {
 	
 	// TODO 403 404 401 page handler (if user go to /admin etc).
 	// TODO change color and transparent in toastr
-	// TODO if Admin change role to User he can't visit adminPage
+	// TODO Refactor 
 	
 	private String previousPage = "/";
 	
@@ -97,6 +102,21 @@ public class UserController {
 		userService.update(updatedUser);
 
 		redirectAttributes.addFlashAttribute("action", "successEdit");
+
+		if (userId == authUser.getId()
+				&& authUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
+				&& !userEditDto.getRoles().contains(new Role("ROLE_ADMIN"))) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			Collection<GrantedAuthority> updatedAuthorities = new HashSet<>();
+			for (Role role : updatedUser.getRoles()) {
+				updatedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+			}
+			Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
+			SecurityContextHolder.getContext().setAuthentication(newAuth);
+			return "redirect:/";
+		}
+		
+		
 		return "redirect:" + previousPage;
 	}
 	
