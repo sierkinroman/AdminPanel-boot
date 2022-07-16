@@ -25,11 +25,11 @@
 
     <table class="table">
         <tr>
-            <th class="table_header">Username</th>
-            <th class="table_header">Email</th>
-            <th class="table_header">First name</th>
-            <th class="table_header">Last name</th>
-            <th class="table_header">Roles</th>
+            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=username, sortAsc=${isSortAsc})}" data-name="username">Username</a></th>
+            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=email, sortAsc=${isSortAsc})}" data-name="email">Email</a></th>
+            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=firstName, sortAsc=${isSortAsc})}" data-name="firstName">First name</a></th>
+            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=lastName, sortAsc=${isSortAsc})}" data-name="lastName">Last name</a></th>
+            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=roles, sortAsc=${isSortAsc})}" data-name="roles">Roles</a></th>
             <th class="table_header">Actions</th>
         </tr>
         <tr th:each="user : ${users}">

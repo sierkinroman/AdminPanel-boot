@@ -39,6 +39,7 @@ public class UserController {
 	// TODO 403 404 401 page handler (if user go to /admin etc).
 	// TODO change color and transparent in toastr
 	// TODO Refactor 
+	// TODO Add logging
 	
 	private String previousPage = "/";
 	
