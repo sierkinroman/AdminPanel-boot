@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -39,15 +38,13 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public Set<User> findAll() {
-		//TODO maybe change to SortedHashSet, ordered collection
 		Set<User> users = new HashSet<>();
 		userRepo.findAll().forEach(users::add);
 		return users;
 	}
 	
 	@Override
-	public Page<User> findPaginated(int pageNum, int pageSize) {
-		Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
+	public Page<User> findAll(Pageable pageable) {
 		return userRepo.findAll(pageable);
 	}
 

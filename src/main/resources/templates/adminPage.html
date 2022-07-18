@@ -25,11 +25,11 @@
 
     <table class="table">
         <tr>
-            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=username, sortAsc=${isSortAsc})}" data-name="username">Username</a></th>
-            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=email, sortAsc=${isSortAsc})}" data-name="email">Email</a></th>
-            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=firstName, sortAsc=${isSortAsc})}" data-name="firstName">First name</a></th>
-            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=lastName, sortAsc=${isSortAsc})}" data-name="lastName">Last name</a></th>
-            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=roles, sortAsc=${isSortAsc})}" data-name="roles">Roles</a></th>
+            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=username, sortAsc=${sortField} != 'username' ? 'true' : (${sortAsc} ? 'false' : 'true'))}" data-name="username">Username</a></th>
+            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=email, sortAsc=${sortField} != 'email' ? 'true' : (${sortAsc} ? 'false' : 'true'))}" data-name="email">Email</a></th>
+            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=firstName, sortAsc=${sortField} != 'firstName' ? 'true' : (${sortAsc} ? 'false' : 'true'))}" data-name="firstName">First name</a></th>
+            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=lastName, sortAsc=${sortField} != 'lastName' ? 'true' : (${sortAsc} ? 'false' : 'true'))}" data-name="lastName">Last name</a></th>
+            <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=roles, sortAsc=${sortField} != 'roles' ? 'true' : (${sortAsc} ? 'false' : 'true'))}" data-name="roles">Roles</a></th>
             <th class="table_header">Actions</th>
         </tr>
         <tr th:each="user : ${users}">
@@ -50,16 +50,17 @@
     </table>
     
     <div class="pagination">
-        <a th:if="${currentPage > 1}" th:href="@{/admin/users/1}" class="page_link">&lt;&lt;</a>
-        <a th:if="${currentPage > 1}" th:href="@{'/admin/users/' + ${currentPage - 1}}" class="page_link">&lt;</a>
+        <a th:if="${currentPage > 1}" th:href="@{/admin/users/1(sortField=${sortField}, sortAsc=${sortAsc})}" class="page_link">&lt;&lt;</a>
+        <a th:if="${currentPage > 1}" th:href="@{/admin/users/{previousPage}(previousPage=${currentPage} - 1, sortField=${sortField}, sortAsc=${sortAsc})}" class="page_link">&lt;</a>
 
 		<th:block th:each="i: ${#numbers.sequence(1, totalPages)}">
-			<a th:if="${currentPage != i}" th:href="@{'/admin/users/' + ${i}}" th:text="${i}" class="page_link"></a>
+			<a th:if="${currentPage != i}" th:href="@{/admin/users/{i}(i=${i}, sortField=${sortField}, sortAsc=${sortAsc})}" th:text="${i}" class="page_link"></a>
 			<span th:if="${currentPage == i}" th:text="${i}" class="page_link current_page"></span>
 		</th:block>
 
-        <a th:if="${currentPage < totalPages}" th:href="@{'/admin/users/' + ${currentPage + 1}}" class="page_link">&gt;</a>
-        <a th:if="${currentPage < totalPages}" th:href="@{'/admin/users/' + ${totalPages}}" class="page_link">&gt;&gt;</a>
+        <a th:if="${currentPage < totalPages}" th:href="@{/admin/users/{nextPage}(nextPage=${currentPage} + 1, sortField=${sortField}, sortAsc=${sortAsc})}" class="page_link">&gt;</a>
+        <a th:if="${currentPage < totalPages}" th:href="@{/admin/users/{lastPage}(lastPage=${totalPages}, sortField=${sortField}, sortAsc=${sortAsc})}" class="page_link">&gt;&gt;</a>
+        
     </div>
 
     <div id="modal">

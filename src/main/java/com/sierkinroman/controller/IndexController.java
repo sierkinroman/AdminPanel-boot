@@ -2,12 +2,16 @@ package com.sierkinroman.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sierkinroman.entities.User;
 import com.sierkinroman.service.UserService;
@@ -34,13 +38,25 @@ public class IndexController {
 	}
 	
 	@GetMapping("/admin/users/{pageNum}")
-	public String showAdminPage(@AuthenticationPrincipal UserDetailsImpl authUser, @PathVariable int pageNum, Model model) {
+	public String showAdminPage(@AuthenticationPrincipal UserDetailsImpl authUser,
+			@PathVariable int pageNum,
+			@RequestParam(defaultValue = "username") String sortField,
+			@RequestParam(defaultValue = "true") String sortAsc,
+			Model model) {
 		User loginedUser = userService.findByUsername(authUser.getUsername());
 		model.addAttribute("loginedUser", loginedUser);
-		Page<User> page = userService.findPaginated(pageNum, pageSize);
+
+		Sort sorting = sortAsc.equals("true") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();	
+		Pageable pageable = PageRequest.of(pageNum - 1, pageSize, sorting); 
+		Page<User> page = userService.findAll(pageable);
+
 		model.addAttribute("users", page.getContent());
 		model.addAttribute("currentPage", pageNum);
 		model.addAttribute("totalPages", page.getTotalPages());
+		
+		model.addAttribute("sortField", sortField);
+		model.addAttribute("sortAsc", sortAsc);
+		
 		return "adminPage";
 	}
 	

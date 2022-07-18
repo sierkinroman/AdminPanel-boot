@@ -18,9 +18,7 @@
         <p>
         	Hi, <span th:text="${loginedUser.username}">user</span>
         </p>
-          
-        <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/users/1?uf=kjkj&jf=jkj}">Admin page</a>
-
+        <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/users/1(sortField=username, sortAsc=true)}">Admin page</a>
         <form th:action="@{/logout}" method="POST">
             <input type="submit" value="Log out"/>
         </form>
@@ -37,9 +35,9 @@
             <a th:href="@{/user/edit}">edit</a>
             or
         </p>
-        &nbsp
+        &nbsp;
         <button class="deleteBtn">delete</button>
-        &nbsp
+        &nbsp;
         <p>
             yourself
         </p>
