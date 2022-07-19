@@ -30,6 +30,9 @@ public class DataLoader {
 	@EventListener(ApplicationReadyEvent.class)
     @Transactional
 	public void runAfterStartup() {
+		createRoleIfNotExists("ROLE_ADMIN");
+		createRoleIfNotExists("ROLE_USER");
+		
 		createUserIfNotExists("admin",
 				  "admin",
 				  "admin@gmail.com",
@@ -38,7 +41,7 @@ public class DataLoader {
 				  Collections.singleton(roleService.findByName("ROLE_ADMIN")));
 		
 		Set<Role> roleUser = Collections.singleton(roleService.findByName("ROLE_USER"));
-		int countUser = 50;
+		int countUser = 49;
 		for (int i = 1; i <= countUser; i++) {
 			createUserIfNotExists("user" + i,
 								  "user" + i,
@@ -47,6 +50,13 @@ public class DataLoader {
 								  "UserLN" + i,
 								  roleUser);
 		}	
+	}
+	
+	private void createRoleIfNotExists(String name) {
+		if (roleService.findByName(name) == null) {
+			Role role = new Role(name);
+			roleService.save(role);
+		}
 	}
 	
     @Transactional
