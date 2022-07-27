@@ -39,6 +39,7 @@ public class UserController {
 	// TODO change color and transparent in toastr
 	// TODO Refactor 
 	// TODO Add logging
+	// TODO while edit user, user' role can't be empty (or default ROLE_USER)
 	
 	private String previousPage = "/";
 	

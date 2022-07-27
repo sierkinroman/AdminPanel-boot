@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	  xmlns:th="http://www.thymeleaf.org">
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,8 +12,8 @@
 </head>
 <body>  
     <div class="form_wrapper">
-        <form th:action="@{/signup}" method="POST" th:object="${userSignupDto}" class="form">
-            <p class="form_title">Sign up</p>
+        <form th:action="${#authorization.expression('isAuthenticated()')} ? @{/admin/addUser} : @{/signup}" method="POST" th:object="${userSignupDto}" class="form">
+            <p class="form_title" th:text="${#authorization.expression('isAuthenticated()')} ? 'Add User' : 'Sign up'">Sign up</p>
             <p class="text_form">Username:</p>
             <input type="text" name="username" th:field="*{username}" autofocus class="input_form">
             <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="invalid_field"></p>
@@ -37,13 +38,16 @@
             <input type="text" name="lastName" th:field="*{lastName}" class="input_form">
             <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="invalid_field"></p>
                 
-            <!--  
-            <p th:if="${errorRegister}" th:text="${errorMessage}" class="invalid_field">*Login is used</p>
-            -->
+			<div sec:authorize="hasRole('ROLE_ADMIN')">
+				<p class="text_form">Roles:</p>
+	            <div th:each="role : ${listRoles}" class="role">
+	            	<input type="checkbox" name="roles" th:field="*{roles}" th:value="${role.id}"><span th:text="${role.name}">role</span>
+	            </div>
+            </div>
             
-            <input type="submit" value="SIGN UP" class="button_form">
+            <input type="submit" th:value="${#authorization.expression('isAuthenticated()')} ? 'ADD USER' : 'SIGN UP'" class="button_form">
             
-            <p class="message">Registered? <a th:href="@{/login}">Log in</a></p>
+            <p sec:authorize="isAnonymous()" class="message">Registered? <a th:href="@{/login}">Log in</a></p>
         </form>
     </div>
 

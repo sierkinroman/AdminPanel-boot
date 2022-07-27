@@ -22,7 +22,10 @@
     </div>
 
     <h2 class="table_title">All users:</h2>
-
+    
+    <!-- TODO add styles -->
+    <a th:href="@{/admin/addUser}">Add user</a>
+    
     <table class="table">
         <tr>
             <th class="table_header"><a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField=username, sortAsc=${sortField} != 'username' ? 'true' : (${sortAsc} ? 'false' : 'true'))}" data-name="username">Username</a></th>

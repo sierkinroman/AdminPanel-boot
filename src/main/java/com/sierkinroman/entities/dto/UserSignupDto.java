@@ -1,6 +1,7 @@
 package com.sierkinroman.entities.dto;
 
 import java.util.Collections;
+import java.util.Set;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -8,6 +9,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.sierkinroman.entities.Role;
 import com.sierkinroman.entities.User;
 import com.sierkinroman.service.RoleService;
 
@@ -38,6 +40,8 @@ public class UserSignupDto {
 	
 	@NotBlank(message = "*Last name is required")
 	private String lastName;
+	
+	private Set<Role> roles;
 	
 	public User getUser(BCryptPasswordEncoder bCryptPasswordEncoder, RoleService roleService) {
 		return new User(username,

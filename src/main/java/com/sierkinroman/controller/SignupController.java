@@ -3,6 +3,9 @@ package com.sierkinroman.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +18,7 @@ import com.sierkinroman.entities.User;
 import com.sierkinroman.entities.dto.UserSignupDto;
 import com.sierkinroman.service.RoleService;
 import com.sierkinroman.service.UserService;
+import com.sierkinroman.service.impl.userdetails.UserDetailsImpl;
 
 @Controller
 public class SignupController {
@@ -28,15 +32,16 @@ public class SignupController {
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
-	@GetMapping("/signup")
+	@GetMapping(value = {"/signup", "/admin/addUser"})
 	public String showSignup(Model model) {
 		model.addAttribute("userSignupDto", new UserSignupDto());
+		model.addAttribute("listRoles", roleService.findAll());
 		return "signup";
 	}
 	
-	@PostMapping("/signup")
+	@PostMapping(value = {"/signup", "/admin/addUser"})
 	public String signupUser(@ModelAttribute("userSignupDto") @Valid UserSignupDto userSignupDto,
-							 BindingResult bindingResult) {
+							 BindingResult bindingResult, Model model) {
 		User userByUsername = userService.findByUsername(userSignupDto.getUsername());
 		User userByEmail = userService.findByEmail(userSignupDto.getEmail());
 		if (userByUsername != null) {
@@ -50,9 +55,19 @@ public class SignupController {
 		}
 		
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("listRoles", roleService.findAll());
 			return "signup";
 		} else {
-			userService.save(userSignupDto.getUser(bCryptPasswordEncoder, roleService));
+			User savedUser = userSignupDto.getUser(bCryptPasswordEncoder, roleService);
+			Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			if (principal instanceof UserDetailsImpl &&
+					((UserDetailsImpl) principal).getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+				savedUser.setRoles(userSignupDto.getRoles());
+				userService.save(savedUser);
+				// TODO return to refferer page (pagination and sorting)
+				return "redirect:/";
+			}
+			userService.save(savedUser);
 		}
 		return "redirect:/login";
 	}
