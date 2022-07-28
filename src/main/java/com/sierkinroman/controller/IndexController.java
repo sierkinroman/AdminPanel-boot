@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +16,9 @@ import com.sierkinroman.entities.User;
 import com.sierkinroman.service.UserService;
 import com.sierkinroman.service.impl.userdetails.UserDetailsImpl;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 public class IndexController {
 	
@@ -26,14 +28,16 @@ public class IndexController {
 	private int pageSize = 10;
 	
 	@GetMapping("/")
-	public String showUserPage(@AuthenticationPrincipal UserDetailsImpl authUser, Model model, Authentication authentication) {
+	public String showUserPage(@AuthenticationPrincipal UserDetailsImpl authUser, Model model) {
 		User loginedUser = userService.findByUsername(authUser.getUsername());
 		model.addAttribute("loginedUser", loginedUser);
+		log.info("Showing homepage");
 		return "userPage";
 	}
 	
 	@GetMapping("/login")
 	public String showLoginPage() {
+		log.info("Showing login page");
 		return "login";
 	}
 	
@@ -46,8 +50,8 @@ public class IndexController {
 		User loginedUser = userService.findByUsername(authUser.getUsername());
 		model.addAttribute("loginedUser", loginedUser);
 
-		Sort sorting = sortAsc.equals("true") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();	
-		Pageable pageable = PageRequest.of(pageNum - 1, pageSize, sorting); 
+		Sort sort = sortAsc.equals("true") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();	
+		Pageable pageable = PageRequest.of(pageNum - 1, pageSize, sort); 
 		Page<User> page = userService.findAll(pageable);
 
 		model.addAttribute("users", page.getContent());
@@ -57,6 +61,7 @@ public class IndexController {
 		model.addAttribute("sortField", sortField);
 		model.addAttribute("sortAsc", sortAsc);
 		
+		log.info("Showing adminPage, pageNumber = '{}', sortField = '{}', sortAsc = '{}'", pageNum, sortField, sortAsc);
 		return "adminPage";
 	}
 	

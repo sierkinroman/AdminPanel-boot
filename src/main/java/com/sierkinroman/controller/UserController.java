@@ -8,8 +8,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,12 +31,15 @@ import com.sierkinroman.service.RoleService;
 import com.sierkinroman.service.UserService;
 import com.sierkinroman.service.impl.userdetails.UserDetailsImpl;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 public class UserController {
 	
 	// TODO change color and transparent in toastr
 	// TODO Refactor 
-	// TODO Add logging
+	// TODO Add logging after refactoring, when valid/invalid login log it
 	// TODO while edit user, user' role can't be empty (or default ROLE_USER)
 	
 	private String previousPage = "/";
@@ -52,15 +53,23 @@ public class UserController {
 	@GetMapping(value = {"/admin/{id}/edit", "/user/edit"})
 	public String showEditForm(@PathVariable Optional<Long> id, Model model, 
 							   HttpServletRequest request) {
-		model.addAttribute("userEditDto", new UserEditDto(userService
-			.findById(id.orElseGet(() -> {
-				UserDetailsImpl user = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-				return user.getId();
-			})
-		)));
+		long userId = id.orElseGet(() -> {
+			UserDetailsImpl user = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			return user.getId();
+		});
+		
+//		model.addAttribute("userEditDto", new UserEditDto(userService
+//			.findById(id.orElseGet(() -> {
+//				UserDetailsImpl user = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//				return user.getId();
+//			})
+//		)));
+		model.addAttribute("userEditDto", new UserEditDto(userService.findById(userId)));
+		
 		model.addAttribute("listRoles", roleService.findAll());
 		previousPage = request.getHeader("Referer");
 		previousPage = previousPage != null ? previousPage : "/";
+		log.info("Showing userEdit page for user with id '{}'", userId);
 		return "userEdit";
 	}
 	

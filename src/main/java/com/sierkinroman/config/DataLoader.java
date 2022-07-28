@@ -15,6 +15,9 @@ import com.sierkinroman.entities.User;
 import com.sierkinroman.service.RoleService;
 import com.sierkinroman.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class DataLoader {
 	
@@ -30,6 +33,7 @@ public class DataLoader {
 	@EventListener(ApplicationReadyEvent.class)
     @Transactional
 	public void runAfterStartup() {
+		log.info("Loading initial data in database");
 		createRoleIfNotExists("ROLE_ADMIN");
 		createRoleIfNotExists("ROLE_USER");
 		
@@ -49,12 +53,14 @@ public class DataLoader {
 								  "User" + i,
 								  "UserLN" + i,
 								  roleUser);
-		}	
+		}
+		log.info("Initial data has loaded in database");
 	}
 	
 	private void createRoleIfNotExists(String name) {
 		if (roleService.findByName(name) == null) {
 			Role role = new Role(name);
+			log.info("Created Role with name - '{}'", name);
 			roleService.save(role);
 		}
 	}
@@ -74,6 +80,7 @@ public class DataLoader {
 								 firstName,
 								 lastName,
 								 roles);
+			log.info("Created User with username - '{}'", username);
 			userService.save(user);
 		}
 	}

@@ -12,6 +12,9 @@ import com.sierkinroman.entities.User;
 import com.sierkinroman.entities.repository.UserRepository;
 import com.sierkinroman.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -20,24 +23,25 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public User findById(long id) {
-		User user = userRepo.findById(id).orElse(null);
-		return user;
+		log.debug("Find User by id '{}'", id);
+		return userRepo.findById(id).orElse(null);
 	}
 	
 	@Override
 	public User findByUsername(String username) {
-		User user = userRepo.findByUsername(username);
-		return user;
+		log.debug("Find User by username '{}'", username);
+		return userRepo.findByUsername(username);
 	}
 
 	@Override
 	public User findByEmail(String email) {
-		User user = userRepo.findByEmail(email);
-		return user;
+		log.debug("Find User by email '{}'", email);
+		return userRepo.findByEmail(email);
 	}
 	
 	@Override
 	public Set<User> findAll() {
+		log.debug("Find all Users");
 		Set<User> users = new HashSet<>();
 		userRepo.findAll().forEach(users::add);
 		return users;
@@ -45,21 +49,25 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public Page<User> findAll(Pageable pageable) {
+		log.debug("Find all Users with pageable {}", pageable);
 		return userRepo.findAllDistinctBy(pageable);
 	}
 
 	@Override
 	public User save(User user) {
+		log.debug("Save User with id '{}'", user.getId());
 		return userRepo.save(user);
 	}
 	
 	@Override
 	public void update(User user) {
+		log.debug("Update User with id '{}'", user.getId());
 		userRepo.save(user);	
 	}
 
 	@Override
 	public void deleteById(long id) {
+		log.debug("Delete User with id - '{}'", id);
 		userRepo.deleteById(id);
 	}
 	
