@@ -31,7 +31,6 @@ public class DataLoader {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@EventListener(ApplicationReadyEvent.class)
-    @Transactional
 	public void runAfterStartup() {
 		log.info("Loading initial data in database");
 		createRoleIfNotExists("ROLE_ADMIN");
@@ -60,12 +59,11 @@ public class DataLoader {
 	private void createRoleIfNotExists(String name) {
 		if (roleService.findByName(name) == null) {
 			Role role = new Role(name);
-			log.info("Created Role with name - '{}'", name);
 			roleService.save(role);
+			log.info("Created Role with name - '{}'", name);
 		}
 	}
-	
-    @Transactional
+
 	private void createUserIfNotExists(String username,
 									   String password,
 									   String email,
@@ -80,8 +78,8 @@ public class DataLoader {
 								 firstName,
 								 lastName,
 								 roles);
-			log.info("Created User with username - '{}'", username);
 			userService.save(user);
+			log.info("Created User with username - '{}'", username);
 		}
 	}
 

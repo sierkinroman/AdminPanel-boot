@@ -3,12 +3,12 @@
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
     <title>Edit account</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/signup.css}" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/signup.css}" type="text/css" />
 </head>
 <body>
     <div class="form_wrapper">
@@ -17,7 +17,7 @@
             <p class="form_title">Edit account</p>  
 
             <p class="text_form">Username:</p>
-            <input type="text" name="username" th:field="*{username}" readonly class="input_form">
+            <input type="text" name="username" th:field="*{username}" readonly="readonly" class="input_form" />
             <!--  Add change password separate form
             <p class="text_form">Password:</p>
             <input type="password" name="password" id="password" th:value="${user.password}" class="input_form">     
@@ -25,15 +25,15 @@
             <input type="password" name="confirmPassword" class="input_form">   
             -->   
             <p class="text_form">E-mail:</p>
-            <input type="text" name="email" th:field="*{email}" class="input_form">
+            <input type="text" name="email" th:field="*{email}" class="input_form" />
             <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="invalid_field"></p>
             
             <p class="text_form">First name:</p>
-            <input type="text" name="firstName" th:field="*{firstName}" class="input_form">
+            <input type="text" name="firstName" th:field="*{firstName}" class="input_form" />
             <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="invalid_field"></p>
             
             <p class="text_form">Last name:</p>
-            <input type="text" name="lastName" th:field="*{lastName}" class="input_form">
+            <input type="text" name="lastName" th:field="*{lastName}" class="input_form" />
             <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="invalid_field"></p>
             
             <!-- <p class="text_form">Role:</p>
@@ -41,13 +41,13 @@
                 <option th:value="ROLE_USER" th:text="User" th:selected="('ROLE_USER' == *{role})"></option>
                 <option th:value="ROLE_ADMIN" th:text="Admin" th:selected="('ROLE_ADMIN' == *{role})"></option>
             </select> -->
-            <div sec:authorize="hasRole('ROLE_ADMIN')">
+            <div sec:authorize="hasRole('ROLE_ADMIN')" id="roles_wrapper">
 				<p class="text_form">Roles:</p>
 	            <div th:each="role : ${listRoles}" class="role">
-	            	<input type="checkbox" name="roles" th:field="*{roles}" th:value="${role.id}"><span th:text="${role.name}">role</span>
+	            	<input type="checkbox" name="roles" th:field="*{roles}" th:value="${role.id}" /><span th:text="${role.name}">role</span>
 	            </div>
             </div>
-            <input type="submit" th:value="EDIT" class="button_form">
+            <input type="submit" th:value="EDIT" class="button_form" />
         </form>
     </div>
 </body>

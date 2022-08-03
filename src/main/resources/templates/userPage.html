@@ -3,15 +3,15 @@
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
     <title>Hello</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/userPage.css}" type="text/css">
-	<link rel="stylesheet" th:href="@{/css/toastr/toastr.min.css}" type="text/css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/userPage.css}" type="text/css" />
+	<link rel="stylesheet" th:href="@{/css/toastr/toastr.min.css}" type="text/css" />
 </head>
 <body>
     <div class="header">
@@ -20,7 +20,7 @@
         </p>
         <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/users/1(sortField=username, sortAsc=true)}">Admin page</a>
         <form th:action="@{/logout}" method="POST">
-            <input type="submit" value="Log out"/>
+            <input type="submit" value="Log out" />
         </form>
     </div>
 
@@ -35,9 +35,9 @@
             <a th:href="@{/user/edit}">edit</a>
             or
         </p>
-        &nbsp;
+        &#160;
         <button class="deleteBtn">delete</button>
-        &nbsp;
+        &#160;
         <p>
             yourself
         </p>
@@ -49,8 +49,8 @@
             <div class="buttons">
                 <button class="modal_btn">No</button>
 				<form id="delete_form" method="POST">
-					<input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                    <input type="submit" value="Yes" class="modal_btn modal_yesBtn">
+					<input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                    <input type="submit" value="Yes" class="modal_btn modal_yesBtn" />
                 </form>
             </div>
             <button class="modal_close">

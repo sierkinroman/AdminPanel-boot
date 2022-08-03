@@ -3,49 +3,49 @@
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
     <title>Sign up</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/signup.css}" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/signup.css}" type="text/css" />
 </head>
 <body>  
     <div class="form_wrapper">
         <form th:action="${#authorization.expression('isAuthenticated()')} ? @{/admin/addUser} : @{/signup}" method="POST" th:object="${userSignupDto}" class="form">
             <p class="form_title" th:text="${#authorization.expression('isAuthenticated()')} ? 'Add User' : 'Sign up'">Sign up</p>
             <p class="text_form">Username:</p>
-            <input type="text" name="username" th:field="*{username}" autofocus class="input_form">
+            <input type="text" name="username" th:field="*{username}" autofocus="autofocus" class="input_form" />
             <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="invalid_field"></p>
             
             <p class="text_form">Password:</p>
-            <input type="password" name="password" id="password" th:value="*{password}" class="input_form">
+            <input type="password" name="password" id="password" th:value="*{password}" class="input_form" />
             <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="invalid_field"></p>
             
             <p class="text_form">Confirm password:</p>
-            <input type="password" name="confirmPassword" id="confirmPassword" th:value="*{confirmPassword}" class="input_form">
+            <input type="password" name="confirmPassword" id="confirmPassword" th:value="*{confirmPassword}" class="input_form" />
             <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="invalid_field"></p>
             
             <p class="text_form">E-mail:</p>
-            <input type="text" name="email" th:field="*{email}" class="input_form">
+            <input type="text" name="email" th:field="*{email}" class="input_form" />
             <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="invalid_field"></p>
             
             <p class="text_form">First name:</p>
-            <input type="text" name="firstName" th:field="*{firstName}" class="input_form">
+            <input type="text" name="firstName" th:field="*{firstName}" class="input_form" />
             <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="invalid_field"></p>
             
             <p class="text_form">Last name:</p>
-            <input type="text" name="lastName" th:field="*{lastName}" class="input_form">
+            <input type="text" name="lastName" th:field="*{lastName}" class="input_form" />
             <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="invalid_field"></p>
                 
-			<div sec:authorize="hasRole('ROLE_ADMIN')">
+			<div sec:authorize="hasRole('ROLE_ADMIN')" id="roles_wrapper">
 				<p class="text_form">Roles:</p>
 	            <div th:each="role : ${listRoles}" class="role">
-	            	<input type="checkbox" name="roles" th:field="*{roles}" th:value="${role.id}"><span th:text="${role.name}">role</span>
+	            	<input type="checkbox" name="roles" th:field="*{roles}" th:value="${role.id}" /><span th:text="${role.name}">role</span>
 	            </div>
             </div>
             
-            <input type="submit" th:value="${#authorization.expression('isAuthenticated()')} ? 'ADD USER' : 'SIGN UP'" class="button_form">
+            <input type="submit" th:value="${#authorization.expression('isAuthenticated()')} ? 'ADD USER' : 'SIGN UP'" class="button_form" />
             
             <p sec:authorize="isAnonymous()" class="message">Registered? <a th:href="@{/login}">Log in</a></p>
         </form>
