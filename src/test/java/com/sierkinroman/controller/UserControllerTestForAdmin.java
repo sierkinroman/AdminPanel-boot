@@ -5,8 +5,8 @@ import static org.springframework.security.test.web.servlet.response.SecurityMoc
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
 import java.util.Collections;
@@ -14,11 +14,7 @@ import java.util.HashSet;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +33,6 @@ import com.sierkinroman.service.UserService;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
-@TestMethodOrder(OrderAnnotation.class)
 class UserControllerTestForAdmin {
 	
 	@Autowired
@@ -73,36 +68,30 @@ class UserControllerTestForAdmin {
 	
 	@Test
 	@WithUserDetails(value = "admin")
-	@Order(1)
 	public void testShowEditForm() throws Exception {
+		long id = userService.findByUsername("admin").getId();
+		
 		this.mockMvc.perform(get("/user/edit"))
-			.andExpect(status().isOk())
-			.andExpect(authenticated())
-			.andExpect(xpath("//input[@id='username' and @value='admin']").exists())
-			.andExpect(xpath("//div[@id='roles_wrapper']").exists());
+			.andExpect(status().is3xxRedirection())
+			.andExpect(authenticated().withRoles("ADMIN"))
+			.andExpect(redirectedUrl("/admin/" + id + "/edit"));
 		
 		this.mockMvc.perform(get("/admin/{id}/edit", 1))
 			.andExpect(status().isOk())
-			.andExpect(authenticated())
+			.andExpect(authenticated().withRoles("ADMIN"))
 			.andExpect(xpath("//input[@id='username' and @value='admin']").exists())
 			.andExpect(xpath("//div[@id='roles_wrapper']").exists());
 	}
 	
 	@Test
 	@WithUserDetails(value = "admin")
-	@Order(2)
-	public void testDeleteSelf_LastAdmin() throws Exception {
+	public void testIncorrectDeleteSelf_LastAdmin() throws Exception {
 		tearDown();
-		
-		this.mockMvc.perform(post("/user/delete").with(csrf()))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(authenticated())
-			.andExpect(view().name("redirect:/"));
 		
 		this.mockMvc.perform(post("/admin/{id}/delete", 1).header("Referer", getRefererUrl()).with(csrf()))
 			.andExpect(status().is3xxRedirection())
-			.andExpect(authenticated())
-			.andExpect(view().name("redirect:" + getRefererUrl()));
+			.andExpect(authenticated().withRoles("ADMIN"))
+			.andExpect(redirectedUrl(getRefererUrl()));
 	}
 	
 	private String getRefererUrl() {
@@ -111,91 +100,60 @@ class UserControllerTestForAdmin {
 	
 	@Test
 	@WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-	@Order(3)
-	public void testCorrectDeleteSelf_NotLastAdmin_FromUserpage() throws Exception {
-		this.mockMvc.perform(post("/user/delete").with(csrf()))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(unauthenticated())
-			.andExpect(view().name("redirect:/login"));
-	}
-	
-	@Test
-	@WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-	@Order(4)
-	public void testCorrectDeleteSelf_NotLastAdmin_FromAdminpage() throws Exception {
+	public void testCorrectDeleteSelf_NotLastAdmin() throws Exception {
 		long userId = userService.findByUsername("admin2").getId();
 		
 		this.mockMvc.perform(post("/admin/{id}/delete", userId).with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(unauthenticated())
-			.andExpect(view().name("redirect:/login"));
+			.andExpect(redirectedUrl("/login"));
 	}
 	
 	@Test
 	@WithUserDetails(value = "admin")
-	@Order(5)
-	public void testCorrectDelete_NotLastAdmin_FromAdminpage() throws Exception {
+	public void testCorrectDelete_NotLastAdmin() throws Exception {
 		long userId = userService.findByUsername("admin2").getId();
 
 		this.mockMvc.perform(post("/admin/{id}/delete", userId).header("Referer", getRefererUrl()).with(csrf()))
 			.andExpect(status().is3xxRedirection())
-			.andExpect(authenticated())
-			.andExpect(view().name("redirect:" + getRefererUrl()));
+			.andExpect(authenticated().withRoles("ADMIN"))
+			.andExpect(redirectedUrl(getRefererUrl()));
 	}	
 	
 	@Test
 	@WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-	@Order(6)
-	@Disabled
-	public void testCorrectUpdateSelf_FromUserpage() throws Exception {		
-		this.mockMvc.perform(post("/user/edit").flashAttr("userEditDto", getAdmin2EditDto()).with(csrf()))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(authenticated().withRoles("ADMIN"))
-			.andExpect(view().name("redirect:/"));
-	}
-	
-	private UserEditDto getAdmin2EditDto() {
-		UserEditDto userEditDto = new UserEditDto(userService.findByUsername("admin2"));
+	public void testCorrectUpdateSelf() throws Exception {
+		User admin2 = userService.findByUsername("admin2");
+		
+		UserEditDto userEditDto = new UserEditDto(admin2);
 		userEditDto.setEmail("admin2.new@gmail.com");
 		userEditDto.setFirstName("Admin2NewName");
 		userEditDto.setLastName("Admin2NewLastName");
-		return userEditDto;
-	}
-	
-	@Test
-	@WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-	@Order(7)
-	public void testCorrectUpdateSelf_FromAdminpage() throws Exception {
-		User admin2 = userService.findByUsername("admin2");
 
-		this.mockMvc.perform(post("/admin/{id}/edit", admin2.getId()).flashAttr("userEditDto", getAdmin2EditDto()).header("Referer", getRefererUrl()).with(csrf()))
+		this.mockMvc.perform(get("/admin/{id}/edit", admin2.getId()).header("Referer", getRefererUrl()));
+		
+		this.mockMvc.perform(post("/admin/{id}/edit", admin2.getId()).flashAttr("userEditDto", userEditDto).with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(authenticated().withRoles("ADMIN"))
-			.andExpect(view().name("redirect:" + getRefererUrl()));
+			.andExpect(redirectedUrl(getRefererUrl()));
 	}
 	
 	@Test
 	@WithUserDetails(value = "admin")
-	@Order(8)
-	@Disabled
 	public void testIncorrectUpdateSelf_RemoveRoleAdmin_FromLastAdmin() throws Exception {
 		tearDown();
-		
 		User admin = userService.findByUsername("admin");
 		
-		this.mockMvc.perform(post("/user/edit").flashAttr("userEditDto", getRoleUserEditDto(admin)).with(csrf()))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(authenticated().withRoles("ADMIN"))
-			.andExpect(view().name("redirect:/"));
+		this.mockMvc.perform(get("/admin/{id}/edit", admin.getId()).header("Referer", getRefererUrl()));
 
-		this.mockMvc.perform(post("/admin/{id}/edit", admin.getId()).flashAttr("userEditDto", getRoleUserEditDto(admin)).header("Referer", getRefererUrl()).with(csrf()))
+		this.mockMvc.perform(post("/admin/{id}/edit", admin.getId()).flashAttr("userEditDto", getNotAdminEditDto(admin)).with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(authenticated().withRoles("ADMIN"))
-			.andExpect(view().name("redirect:" + getRefererUrl()));
+			.andExpect(redirectedUrl(getRefererUrl()));
 		
 	}
 	
-	private UserEditDto getRoleUserEditDto(User user) {
+	private UserEditDto getNotAdminEditDto(User user) {
 		UserEditDto userEditDto = new UserEditDto(user);
 		HashSet<Role> roles = new HashSet<>();
 		roles.add(roleService.findByName("ROLE_USER"));
@@ -205,31 +163,15 @@ class UserControllerTestForAdmin {
 	
 	@Test
 	@WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-	@Order(9)
-	public void testCorrectUpdateSelf_RemoveRoleAdmin_FromNotLastAdmin_FromHomepage() throws Exception {		
+	public void testCorrectUpdateSelf_RemoveRoleAdmin_FromNotLastAdmin() throws Exception {
 		User admin2 = userService.findByUsername("admin2");
 		
-		this.mockMvc.perform(post("/user/edit").flashAttr("userEditDto", getRoleUserEditDto(admin2)).with(csrf()))
+		this.mockMvc.perform(get("/admin/{id}/edit", admin2.getId()).header("Referer", getRefererUrl()));
+		
+		this.mockMvc.perform(post("/admin/{id}/edit", admin2.getId()).flashAttr("userEditDto", getNotAdminEditDto(admin2)).with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(authenticated().withRoles("USER"))
-			.andExpect(view().name("redirect:/"));
-		
-		this.mockMvc.perform(get("/user/edit"))
-			.andExpect(status().isOk())
-			.andExpect(authenticated().withRoles("USER"))
-			.andExpect(xpath("//div[@id='roles_wrapper']").doesNotExist());
-	}
-	
-	@Test
-	@WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-	@Order(10)
-	public void testCorrectUpdateSelf_RemoveRoleAdmin_FromNotLastAdmin_FromAdminpage() throws Exception {
-		User admin2 = userService.findByUsername("admin2");
-		
-		this.mockMvc.perform(post("/admin/{id}/edit", admin2.getId()).flashAttr("userEditDto", getRoleUserEditDto(admin2)).header("Referer", getRefererUrl()).with(csrf()))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(authenticated().withRoles("USER"))
-			.andExpect(view().name("redirect:/"));
+			.andExpect(redirectedUrl("/"));
 		
 		this.mockMvc.perform(get("/user/edit"))
 			.andExpect(status().isOk())

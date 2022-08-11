@@ -5,6 +5,7 @@ import static org.springframework.security.test.web.servlet.response.SecurityMoc
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
@@ -36,18 +37,18 @@ class UserControllerTestForUser {
 	public void testShowEditForm() throws Exception {
 		this.mockMvc.perform(get("/user/edit"))
 			.andExpect(status().isOk())
-			.andExpect(authenticated())
+			.andExpect(authenticated().withRoles("USER"))
 			.andExpect(xpath("//input[@id='username' and @value='user1']").exists())
 			.andExpect(xpath("//div[@id='roles_wrapper']").doesNotExist());
 	}
 	
 	@Test
 	@WithUserDetails(value = "user49")
-	public void testDelete() throws Exception {
+	public void testCorrectDelete() throws Exception {
 		this.mockMvc.perform(post("/user/delete").with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(unauthenticated())
-			.andExpect(view().name("redirect:/login"));
+			.andExpect(redirectedUrl("/login"));
 	}
 	
 	@Test
@@ -60,8 +61,8 @@ class UserControllerTestForUser {
 		
 		this.mockMvc.perform(post("/user/edit").flashAttr("userEditDto", userEditDto).with(csrf()))
 			.andExpect(status().is3xxRedirection())
-			.andExpect(authenticated())
-			.andExpect(view().name("redirect:/"));
+			.andExpect(authenticated().withRoles("USER"))
+			.andExpect(redirectedUrl("/"));
 	}
 	
 	@Test
@@ -72,7 +73,7 @@ class UserControllerTestForUser {
 		
 		this.mockMvc.perform(post("/user/edit").flashAttr("userEditDto", userEditDto).with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(authenticated())
+			.andExpect(authenticated().withRoles("USER"))
 			.andExpect(view().name("userEdit"))
 			.andExpect(xpath("/html/body/div/form/p[4]").string("*E-mail is used"));
 	}

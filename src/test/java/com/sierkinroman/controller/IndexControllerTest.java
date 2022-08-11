@@ -1,6 +1,7 @@
 package com.sierkinroman.controller;
 
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,7 +30,7 @@ public class IndexControllerTest {
 	public void testShowUserPage() throws Exception {
 		this.mockMvc.perform(get("/"))
 			.andExpect(status().isOk())
-			.andExpect(authenticated())
+			.andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
 			.andExpect(xpath("/html/body/div[1]/p/span").string("admin"));
 	}
 
@@ -38,6 +39,7 @@ public class IndexControllerTest {
 	public void testShowLoginPage() throws Exception {
 		this.mockMvc.perform(get("/login"))
 			.andExpect(status().isOk())
+			.andExpect(unauthenticated())
 			.andExpect(view().name("login"));
 	}
 
@@ -45,7 +47,7 @@ public class IndexControllerTest {
 	public void testShowAdminPage() throws Exception {
 		this.mockMvc.perform(get("/admin/users/1"))
 			.andExpect(status().isOk())
-			.andExpect(authenticated())
+			.andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
 			.andExpect(xpath("/html/body/table").exists());
 	}
 	
@@ -53,7 +55,7 @@ public class IndexControllerTest {
 	public void testShowAdminPage_SortUsernameAsc() throws Exception {
 		this.mockMvc.perform(get("/admin/users/1").queryParam("sortField", "username").queryParam("sortAsc", "true"))
 			.andExpect(status().isOk())
-			.andExpect(authenticated())
+			.andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
 			.andExpect(request().attribute("sortField", "username"))
 			.andExpect(request().attribute("sortAsc", "true"))
 			.andExpect(xpath("/html/body/table").exists())
@@ -64,7 +66,7 @@ public class IndexControllerTest {
 	public void testShowAdminPage_SortUsernameDesc() throws Exception {
 		this.mockMvc.perform(get("/admin/users/1").queryParam("sortField", "username").queryParam("sortAsc", "false"))
 			.andExpect(status().isOk())
-			.andExpect(authenticated())
+			.andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
 			.andExpect(request().attribute("sortField", "username"))
 			.andExpect(request().attribute("sortAsc", "false"))
 			.andExpect(xpath("/html/body/table").exists())

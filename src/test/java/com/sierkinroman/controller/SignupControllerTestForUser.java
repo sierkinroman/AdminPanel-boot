@@ -1,5 +1,6 @@
 package com.sierkinroman.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -15,7 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.sierkinroman.entities.Role;
+import com.sierkinroman.entities.User;
 import com.sierkinroman.entities.dto.UserSignupDto;
+import com.sierkinroman.service.UserService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -24,6 +28,9 @@ class SignupControllerTestForUser {
 
 	@Autowired
     private MockMvc mockMvc;
+	
+	@Autowired
+	private UserService userService;
 	
 	@Test
 	public void testShowSignup() throws Exception {
@@ -47,6 +54,11 @@ class SignupControllerTestForUser {
 			.andExpect(status().is3xxRedirection())
 			.andExpect(unauthenticated())
 			.andExpect(view().name("redirect:/login"));
+		
+		User registeredUser = userService.findByUsername("user100");
+		
+		assertThat(registeredUser).isNotNull();
+		assertThat(registeredUser.getRoles()).contains(new Role("ROLE_USER"));
 	}
 	
 	@Test
