@@ -27,26 +27,26 @@ public class IndexController {
 	
 	private int pageSize = 10;
 	
+	@GetMapping("/login")
+	public String showLoginPage() {
+		log.info("Show login page");
+		return "login";
+	}
+	
 	@GetMapping("/")
 	public String showUserPage(@AuthenticationPrincipal UserDetailsImpl authUser, Model model) {
 		User loginedUser = userService.findByUsername(authUser.getUsername());
 		model.addAttribute("loginedUser", loginedUser);
-		log.info("Showing homepage");
+		log.info("Show homepage for user with id '{}'", authUser.getId());
 		return "userPage";
-	}
-	
-	@GetMapping("/login")
-	public String showLoginPage() {
-		log.info("Showing login page");
-		return "login";
 	}
 	
 	@GetMapping("/admin/users/{pageNum}")
 	public String showAdminPage(@AuthenticationPrincipal UserDetailsImpl authUser,
-			@PathVariable int pageNum,
-			@RequestParam(defaultValue = "username") String sortField,
-			@RequestParam(defaultValue = "true") String sortAsc,
-			Model model) {
+								@PathVariable int pageNum,
+								@RequestParam(defaultValue = "username") String sortField,
+								@RequestParam(defaultValue = "true") String sortAsc,
+								Model model) {
 		User loginedUser = userService.findByUsername(authUser.getUsername());
 		model.addAttribute("loginedUser", loginedUser);
 
@@ -61,7 +61,7 @@ public class IndexController {
 		model.addAttribute("sortField", sortField);
 		model.addAttribute("sortAsc", sortAsc);
 		
-		log.info("Showing adminPage, pageNumber = '{}', sortField = '{}', sortAsc = '{}'", pageNum, sortField, sortAsc);
+		log.info("Show adminPage for user with id '{}', pageNumber = '{}', sortField = '{}', sortAsc = '{}'", authUser.getId(), pageNum, sortField, sortAsc);
 		return "adminPage";
 	}
 	

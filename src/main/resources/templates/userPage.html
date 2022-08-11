@@ -32,11 +32,11 @@
     <div class="action">
         <p>
             Click here to
-            <a th:href="@{/user/edit}">edit</a>
+            <a th:href="${#authorization.expression('hasRole(''ROLE_ADMIN'')')} ? @{/admin/{id}/edit(id=${loginedUser.id})} : @{/user/edit}">edit</a>
             or
         </p>
         &#160;
-        <button class="deleteBtn">delete</button>
+        <button class="deleteBtn" th:name="${#authorization.expression('hasRole(''ROLE_ADMIN'')')} ? ${loginedUser.id} : ''">delete</button>
         &#160;
         <p>
             yourself

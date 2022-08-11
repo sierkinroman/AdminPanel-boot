@@ -2,7 +2,7 @@ package com.sierkinroman.controller;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,11 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 	
 	// TODO change color and transparent in toastr
-	// TODO Refactor 
-	// TODO Add logging after refactoring, when valid/invalid login log it
 	// TODO while edit user, user' role can't be empty (or default ROLE_USER)
-	
-	private String previousPage = "/";
 	
 	@Autowired
 	private UserService userService;
@@ -50,115 +46,188 @@ public class UserController {
 	@Autowired
 	private RoleService roleService;
 	
-	@GetMapping(value = {"/admin/{id}/edit", "/user/edit"})
-	public String showEditForm(@PathVariable Optional<Long> id, Model model, 
-							   HttpServletRequest request) {
-		long userId = id.orElseGet(() -> {
-			UserDetailsImpl user = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			return user.getId();
-		});
-		
-//		model.addAttribute("userEditDto", new UserEditDto(userService
-//			.findById(id.orElseGet(() -> {
-//				UserDetailsImpl user = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//				return user.getId();
-//			})
-//		)));
-		model.addAttribute("userEditDto", new UserEditDto(userService.findById(userId)));
-		
+	private String previousPage = "/";
+	
+	@GetMapping(value = "/admin/{id}/edit")
+	public String showEditPageToSpecifiedUser(@PathVariable long id,
+											  Model model,
+											  HttpServletRequest request) {
+		model.addAttribute("userEditDto", new UserEditDto(userService.findById(id)));
 		model.addAttribute("listRoles", roleService.findAll());
-		previousPage = request.getHeader("Referer");
-		previousPage = previousPage != null ? previousPage : "/";
-		log.info("Showing userEdit page for user with id '{}'", userId);
+		setPreviousPage(request);
+		log.info("Show userEdit page for user with id '{}'", id);
 		return "userEdit";
 	}
 	
-	@PostMapping(value = {"/admin/{id}/edit", "/user/edit"})
-	public String updateUser(@PathVariable Optional<Long> id,
-			@AuthenticationPrincipal UserDetailsImpl authUser,
-			@ModelAttribute("userEditDto") @Valid UserEditDto userEditDto,
-			BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-		long userId = id.orElseGet(() -> {
-			return authUser.getId();
-		});
-		
-		if (userId == authUser.getId()) {
-			if (authUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
-					&& !userEditDto.getRoles().contains(new Role("ROLE_ADMIN"))
-					&& roleService.findByName("ROLE_ADMIN").getUsers().size() == 1) {
-				redirectAttributes.addFlashAttribute("action", "lastAdminInvalidEdit");
-				return "redirect:" + previousPage;
-			}
+	private void setPreviousPage(HttpServletRequest request) {
+		previousPage = request.getHeader("Referer");
+		previousPage = previousPage != null ? previousPage : "/";
+		log.info("Set previousPage - '{}'", previousPage);
+	}
+	
+	@GetMapping(value = "/user/edit")
+	public String showEditPage(@AuthenticationPrincipal UserDetailsImpl authUser,
+			 				   Model model) {
+		if (authUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+			return "redirect:/admin/" + authUser.getId() + "/edit";
+		}
+		model.addAttribute("userEditDto", new UserEditDto(userService.findById(authUser.getId())));
+		model.addAttribute("listRoles", roleService.findAll());
+		log.info("Show userEdit page for user with id '{}'", authUser.getId());
+		return "userEdit";
+	}
+	
+	@PostMapping(value = "/admin/{id}/edit")
+	public String updateSpecifiedUser(@PathVariable long id,
+									  @AuthenticationPrincipal UserDetailsImpl authUser,
+									  @ModelAttribute("userEditDto") @Valid UserEditDto userEditDto,
+									  BindingResult bindingResult,
+									  Model model,
+									  RedirectAttributes redirectAttributes, 
+									  HttpServletRequest request) {
+		// if Last Admin remove ROLE_ADMIN from self	
+		if (id == authUser.getId()
+				&& isLastAdminChangeSelfRoleToNonAdmin(userEditDto)) {
+			redirectAttributes.addFlashAttribute("action", "lastAdminInvalidEdit");
+			log.info("Last Admin with id - '{}' can't remove ROLE_ADMIN from self", id);
+			return "redirect:" + previousPage;
 		}
 		
-		User userByEmail = userService.findByEmail(userEditDto.getEmail());
-		if (userByEmail != null) {
-			if (userByEmail.getId() != userId) {
-				bindingResult.rejectValue("email", "emailExists");
-			}
-		}
+		// check validation errors
+		rejectEmailIfExists(userEditDto, id, bindingResult);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("listRoles", roleService.findAll());
+			log.info("Presents validation error - '{}'", bindingResult.getAllErrors());
 			return "userEdit";
 		}
 		
-		User updatedUser = userService.findById(userId);
+		// update
+		User updatedUser = userService.findById(id);
 		updatedUser.setEmail(userEditDto.getEmail());
 		updatedUser.setFirstName(userEditDto.getFirstName());
 		updatedUser.setLastName(userEditDto.getLastName());
-		if (authUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-			updatedUser.setRoles(userEditDto.getRoles());
-		}
+		updatedUser.setRoles(userEditDto.getRoles());
 		userService.update(updatedUser);
+		log.info("Updated user with id '{}'", id);
 
 		redirectAttributes.addFlashAttribute("action", "successEdit");
-
-		if (userId == authUser.getId()
-				&& authUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
+		
+		// if authenticated Admin remove ROLE_ADMIN than update authorities in security context
+		if (id == authUser.getId() 
 				&& !userEditDto.getRoles().contains(new Role("ROLE_ADMIN"))) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			Collection<GrantedAuthority> updatedAuthorities = new HashSet<>();
-			for (Role role : updatedUser.getRoles()) {
-				updatedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
-			}
-			Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
-			SecurityContextHolder.getContext().setAuthentication(newAuth);
+			log.info("Authenticated Admin with id '{}' remove ROLE_ADMIN from self", id);
+			setAuthoritiesInAuthentication(updatedUser.getRoles());
 			return "redirect:/";
 		}
-		
 		
 		return "redirect:" + previousPage;
 	}
 	
-	@PostMapping(value = {"/admin/{id}/delete", "/user/delete"})
-	public String deleteUser(@PathVariable Optional<Long> id, @AuthenticationPrincipal UserDetailsImpl authUser, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-		long userId = id.orElseGet(() -> {
-			return authUser.getId();
-		});
+	private boolean isLastAdminChangeSelfRoleToNonAdmin(UserEditDto userEditDto) {
+		return !userEditDto.getRoles().contains(new Role("ROLE_ADMIN"))
+			&& roleService.findByName("ROLE_ADMIN").getUsers().size() == 1;
+	}
+	
+	private void rejectEmailIfExists(UserEditDto userEditDto, 
+									 long updatedUserId,
+									 BindingResult bindingResult) {
+		User userByEmail = userService.findByEmail(userEditDto.getEmail());
+		if (userByEmail != null
+				&& userByEmail.getId() != updatedUserId) {
+			bindingResult.rejectValue("email", "emailExists");
+			log.info("Reject email, '{}' is present in db", userEditDto.getEmail());
+		}
+	}
 		
-		previousPage = request.getHeader("Referer");
-		previousPage = previousPage != null ? previousPage : "/";
+	private void setAuthoritiesInAuthentication(Set<Role> roles) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Collection<GrantedAuthority> updatedAuthorities = new HashSet<>();
+		for (Role role : roles) {
+			updatedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+		}
+
+		User authUser = userService.findByUsername(auth.getName());
+		authUser.setRoles(roles);
+		UserDetailsImpl principal = new UserDetailsImpl(authUser);
+
+		Authentication newAuth = new UsernamePasswordAuthenticationToken(principal, auth.getCredentials(), updatedAuthorities);
+		SecurityContextHolder.getContext().setAuthentication(newAuth);
+		log.info("Update user's authorities in security context");
+	}
+	
+	@PostMapping(value = "/user/edit")
+	public String updateUser(@AuthenticationPrincipal UserDetailsImpl authUser,
+							 @ModelAttribute("userEditDto") @Valid UserEditDto userEditDto,
+							 BindingResult bindingResult,
+							 Model model,
+							 RedirectAttributes redirectAttributes) {
+		// check validation errors
+		rejectEmailIfExists(userEditDto, authUser.getId(), bindingResult);
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("listRoles", roleService.findAll());
+			log.info("Presents validation error - '{}'", bindingResult.getAllErrors());
+			return "userEdit";
+		}
 		
-		if (userId == authUser.getId()) {
-			if (authUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")) 
-					&& roleService.findByName("ROLE_ADMIN").getUsers().size() == 1) {
+		// update
+		User updatedUser = userService.findById(authUser.getId());
+		updatedUser.setEmail(userEditDto.getEmail());
+		updatedUser.setFirstName(userEditDto.getFirstName());
+		updatedUser.setLastName(userEditDto.getLastName());
+		userService.update(updatedUser);
+		log.info("Updated user with id '{}'", authUser.getId());
+
+		redirectAttributes.addFlashAttribute("action", "successEdit");
+		
+		return "redirect:/";
+	}
+	
+	@PostMapping(value = "/admin/{id}/delete")
+	public String deleteSpecifiedUser(@PathVariable long id,
+									  @AuthenticationPrincipal UserDetailsImpl authUser,
+									  HttpServletRequest request,
+									  RedirectAttributes redirectAttributes) {
+		// if Last Admin delete self
+		if (authUser.getId() == id) {
+			if (roleService.findByName("ROLE_ADMIN").getUsers().size() == 1) {
 				redirectAttributes.addFlashAttribute("action", "lastAdminInvalidDelete");
+				log.info("Last Admin with id '{}' can't delete self", id);
+				setPreviousPage(request);
 				return "redirect:" + previousPage;
 			}
 		}
 		
-		userService.deleteById(userId);
-		if (userId == authUser.getId()) {
-			try {
-				request.logout();
-			} catch (ServletException e) {
-				e.printStackTrace();
-			}
+		userService.deleteById(id);
+		log.info("Deleted user with id '{}'", id);
+		
+		if (authUser.getId() == id) {
+			logout(request);
 			return "redirect:/login";
 		}
 		
 		redirectAttributes.addFlashAttribute("action", "successDelete");
+		setPreviousPage(request);
 		return "redirect:" + previousPage;
+	}
+	
+	private void logout(HttpServletRequest request) {
+		try {
+			String username = request.getUserPrincipal().getName();
+			request.logout();
+			log.info("Logout authenticated user '{}'", username);
+		} catch (ServletException e) {
+			log.error("Exception while logout: ", e);
+		}
+	}
+	
+	@PostMapping(value = "/user/delete")
+	public String deleteUser(@AuthenticationPrincipal UserDetailsImpl authUser,
+							 HttpServletRequest request,
+							 RedirectAttributes redirectAttributes) {
+		userService.deleteById(authUser.getId());
+		log.info("Deleted user with id '{}'", authUser.getId());
+		logout(request);
+		return "redirect:/login";
 	}
 	
 }

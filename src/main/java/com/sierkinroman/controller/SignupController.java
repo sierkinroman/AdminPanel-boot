@@ -1,10 +1,9 @@
 package com.sierkinroman.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +16,6 @@ import com.sierkinroman.entities.User;
 import com.sierkinroman.entities.dto.UserSignupDto;
 import com.sierkinroman.service.RoleService;
 import com.sierkinroman.service.UserService;
-import com.sierkinroman.service.impl.userdetails.UserDetailsImpl;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,49 +32,80 @@ public class SignupController {
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
+	private String previousPage = "/";
+	
 	@GetMapping(value = {"/signup", "/admin/addUser"})
-	public String showSignup(Model model) {
+	public String showSignup(Model model, HttpServletRequest request) {
 		model.addAttribute("userSignupDto", new UserSignupDto());
 		model.addAttribute("listRoles", roleService.findAll());
+		setPreviousPage(request);
 		log.info("Showing signup page");
 		return "signup";
 	}
 	
-	@PostMapping(value = {"/signup", "/admin/addUser"})
-	public String signupUser(@ModelAttribute("userSignupDto") @Valid UserSignupDto userSignupDto,
-							 BindingResult bindingResult, Model model) {
-		User userByUsername = userService.findByUsername(userSignupDto.getUsername());
-		User userByEmail = userService.findByEmail(userSignupDto.getEmail());
-		if (userByUsername != null) {
-			log.info("Can't register user, username '{}' exists", userByUsername.getUsername());
-			bindingResult.rejectValue("username", "usernameExists");
-		}
-		if (userByEmail != null) {
-			log.info("Can't register user, email '{}' exists", userByEmail.getEmail());
-			bindingResult.rejectValue("email", "emailExists");
-		}
-		if (!userSignupDto.getPassword().equals(userSignupDto.getConfirmPassword())) {
-			log.info("Can't register user, confirmPassword doesn't match");
-			bindingResult.rejectValue("confirmPassword", "confirmPasswordWrong");
-		}
-		
+	private void setPreviousPage(HttpServletRequest request) {
+		previousPage = request.getHeader("Referer");
+		previousPage = previousPage != null ? previousPage : "/";
+		log.info("Set previousPage - '{}'", previousPage);
+	}
+	
+	@PostMapping(value = "/admin/addUser")
+	public String addUser(@ModelAttribute("userSignupDto") @Valid UserSignupDto userSignupDto,
+			 			  BindingResult bindingResult,
+			 			  Model model) {
+		// check validation errors
+		rejectFieldsIfNotValid(userSignupDto, bindingResult);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("listRoles", roleService.findAll());
-			log.info("Register is not complete, there is invalid fields");
+			log.info("Presents validation error - '{}'", bindingResult.getAllErrors());
 			return "signup";
-		} else {
-			log.info("Saving new user");
-			User savedUser = userSignupDto.getUser(bCryptPasswordEncoder, roleService);
-			Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			if (principal instanceof UserDetailsImpl &&
-					((UserDetailsImpl) principal).getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-				savedUser.setRoles(userSignupDto.getRoles());
-				userService.save(savedUser);
-				// TODO return to refferer page (pagination and sorting)
-				return "redirect:/";
-			}
-			userService.save(savedUser);
+		} 
+		
+		// save new user
+		User savedUser = userSignupDto.getUser(bCryptPasswordEncoder, roleService);
+		savedUser.setRoles(userSignupDto.getRoles());
+		userService.save(savedUser);
+		
+		log.info("Admin registered a new user with username '{}'", savedUser.getUsername());
+		return "redirect:" + previousPage;
+	}
+	
+	private void rejectFieldsIfNotValid(UserSignupDto userSignupDto, BindingResult bindingResult) {
+		User userByUsername = userService.findByUsername(userSignupDto.getUsername());
+		if (userByUsername != null) {
+			log.info("Reject existing username '{}'", userByUsername.getUsername());
+			bindingResult.rejectValue("username", "usernameExists");
 		}
+		
+		User userByEmail = userService.findByEmail(userSignupDto.getEmail());
+		if (userByEmail != null) {
+			log.info("Reject existing email '{}'", userByEmail.getEmail());
+			bindingResult.rejectValue("email", "emailExists");
+		}
+		
+		if (!userSignupDto.getPassword().equals(userSignupDto.getConfirmPassword())) {
+			log.info("Reject not matching confirm password");
+			bindingResult.rejectValue("confirmPassword", "confirmPasswordWrong");
+		}
+	}
+	
+	@PostMapping(value = "/signup")
+	public String signup(@ModelAttribute("userSignupDto") @Valid UserSignupDto userSignupDto,
+			  			 BindingResult bindingResult,
+			  			 Model model) {
+		// check validation errors
+		rejectFieldsIfNotValid(userSignupDto, bindingResult);
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("listRoles", roleService.findAll());
+			log.info("Presents validation error - '{}'", bindingResult.getAllErrors());
+			return "signup";
+		} 
+		
+		// save new user
+		User savedUser = userSignupDto.getUser(bCryptPasswordEncoder, roleService);
+		userService.save(savedUser);
+		log.info("Signup new user with username '{}'", savedUser.getUsername());
+		
 		return "redirect:/login";
 	}
 	
