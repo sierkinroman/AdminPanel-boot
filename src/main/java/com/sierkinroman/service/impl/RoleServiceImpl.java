@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.sierkinroman.entities.Role;
 import com.sierkinroman.entities.repository.RoleRepository;
-import com.sierkinroman.exception.ResourceAlreadyExistsException;
-import com.sierkinroman.exception.ResourceNotFoundException;
 import com.sierkinroman.service.RoleService;
 
 import lombok.extern.slf4j.Slf4j;
