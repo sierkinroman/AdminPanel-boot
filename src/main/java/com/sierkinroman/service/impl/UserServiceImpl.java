@@ -55,13 +55,13 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User save(User user) {
-		log.debug("Save User with id '{}'", user.getId());
+		log.debug("Save User with username '{}'", user.getUsername());
 		return userRepo.save(user);
 	}
 	
 	@Override
 	public void update(User user) {
-		log.debug("Update User with id '{}'", user.getId());
+		log.debug("Update User with username '{}'", user.getUsername());
 		userRepo.save(user);	
 	}
 
