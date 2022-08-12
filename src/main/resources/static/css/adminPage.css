@@ -65,11 +65,28 @@ body {
     font-weight: 400;
 }
 
+.add_user_btn {
+    display: block;
+    text-align: center;
+    width: 100px;
+    text-decoration: none;
+    padding: 4px 10px;
+    background-color: #16425b;
+    border-radius: 10px;
+    color: #f3f4f2;
+    margin: 10px 20px 0 20px;
+    font-weight: 400;
+}
+
+.add_user_btn:hover {
+    background-color: #3c6d8a;
+}
+
 .table {
     border: 2px solid rgb(56, 56, 56);
     border-spacing: 0;
     width: calc(100% - 40px);
-    margin: 40px auto;
+    margin: 20px auto;
 }
 
 .table_header {
@@ -189,7 +206,7 @@ tr:nth-child(n + 2):hover:after {
     text-align: center; 
     display: flex;
     justify-content: center;
-    margin: 0 20px 20px 20px;
+    margin: 20px;
 }
 
 .pagination .page_link {
