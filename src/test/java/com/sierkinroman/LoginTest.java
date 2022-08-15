@@ -18,48 +18,48 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 public class LoginTest {
-	
-	@Autowired
+
+    @Autowired
     private MockMvc mockMvc;
 
-	@Test
-	public void accessDeniedTest() throws Exception {
-		this.mockMvc.perform(get("/"))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(unauthenticated())
-			.andExpect(redirectedUrl("http://localhost/login"));		
-	}
-	
-	@Test
-	public void correctLoginTest() throws Exception {
-		this.mockMvc.perform(formLogin().user("admin").password("admin"))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
-			.andExpect(redirectedUrl("/"));
-	}
-	
-	@Test
-	public void incorrectLoginTest() throws Exception {
-		this.mockMvc.perform(formLogin().user("admin12345").password("admin"))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(unauthenticated())
-			.andExpect(redirectedUrl("/login?error=true"));
-	}
-	
-	@Test
-	public void incorrectPasswordTest() throws Exception {
-		this.mockMvc.perform(formLogin().user("admin").password("admin123"))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(unauthenticated())
-			.andExpect(redirectedUrl("/login?error=true"));
-	}
-	
-	@Test
-	public void emptyCredentialsTest() throws Exception {
-		this.mockMvc.perform(formLogin().user("").password(""))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(unauthenticated())
-			.andExpect(redirectedUrl("/login?error=true"));
-	}
+    @Test
+    public void accessDeniedTest() throws Exception {
+        this.mockMvc.perform(get("/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(unauthenticated())
+                .andExpect(redirectedUrl("http://localhost/login"));
+    }
+
+    @Test
+    public void correctLoginTest() throws Exception {
+        this.mockMvc.perform(formLogin().user("admin").password("admin"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
+                .andExpect(redirectedUrl("/"));
+    }
+
+    @Test
+    public void incorrectLoginTest() throws Exception {
+        this.mockMvc.perform(formLogin().user("admin12345").password("admin"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(unauthenticated())
+                .andExpect(redirectedUrl("/login?error=true"));
+    }
+
+    @Test
+    public void incorrectPasswordTest() throws Exception {
+        this.mockMvc.perform(formLogin().user("admin").password("admin123"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(unauthenticated())
+                .andExpect(redirectedUrl("/login?error=true"));
+    }
+
+    @Test
+    public void emptyCredentialsTest() throws Exception {
+        this.mockMvc.perform(formLogin().user("").password(""))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(unauthenticated())
+                .andExpect(redirectedUrl("/login?error=true"));
+    }
 
 }

@@ -8,12 +8,12 @@ import com.sierkinroman.entities.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-	User findByUsername(String username);
-	
-	User findByEmail(String email);
-	
+    User findByUsername(String username);
+
+    User findByEmail(String email);
+
 //	Page<User> findAllDistinctByRolesIn(Set<Role> roles, Pageable pageable);
-	
-	Page<User> findAllDistinctBy(Pageable pageable);
-	
+
+    Page<User> findAllDistinctBy(Pageable pageable);
+
 }

@@ -18,57 +18,57 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UserServiceImpl implements UserService {
 
-	@Autowired
-	private UserRepository userRepo;
-	
-	@Override
-	public User findById(long id) {
-		log.debug("Find User by id '{}'", id);
-		return userRepo.findById(id).orElse(null);
-	}
-	
-	@Override
-	public User findByUsername(String username) {
-		log.debug("Find User by username '{}'", username);
-		return userRepo.findByUsername(username);
-	}
+    @Autowired
+    private UserRepository userRepo;
 
-	@Override
-	public User findByEmail(String email) {
-		log.debug("Find User by email '{}'", email);
-		return userRepo.findByEmail(email);
-	}
-	
-	@Override
-	public Set<User> findAll() {
-		log.debug("Find all Users");
-		Set<User> users = new HashSet<>();
-		userRepo.findAll().forEach(users::add);
-		return users;
-	}
-	
-	@Override
-	public Page<User> findAll(Pageable pageable) {
-		log.debug("Find all Users with pageable {}", pageable);
-		return userRepo.findAllDistinctBy(pageable);
-	}
+    @Override
+    public User findById(long id) {
+        log.debug("Find User by id '{}'", id);
+        return userRepo.findById(id).orElse(null);
+    }
 
-	@Override
-	public User save(User user) {
-		log.debug("Save User with username '{}'", user.getUsername());
-		return userRepo.save(user);
-	}
-	
-	@Override
-	public void update(User user) {
-		log.debug("Update User with username '{}'", user.getUsername());
-		userRepo.save(user);	
-	}
+    @Override
+    public User findByUsername(String username) {
+        log.debug("Find User by username '{}'", username);
+        return userRepo.findByUsername(username);
+    }
 
-	@Override
-	public void deleteById(long id) {
-		log.debug("Delete User with id - '{}'", id);
-		userRepo.deleteById(id);
-	}
-	
+    @Override
+    public User findByEmail(String email) {
+        log.debug("Find User by email '{}'", email);
+        return userRepo.findByEmail(email);
+    }
+
+    @Override
+    public Set<User> findAll() {
+        log.debug("Find all Users");
+        Set<User> users = new HashSet<>();
+        userRepo.findAll().forEach(users::add);
+        return users;
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        log.debug("Find all Users with pageable {}", pageable);
+        return userRepo.findAllDistinctBy(pageable);
+    }
+
+    @Override
+    public User save(User user) {
+        log.debug("Save User with username '{}'", user.getUsername());
+        return userRepo.save(user);
+    }
+
+    @Override
+    public void update(User user) {
+        log.debug("Update User with username '{}'", user.getUsername());
+        userRepo.save(user);
+    }
+
+    @Override
+    public void deleteById(long id) {
+        log.debug("Delete User with id - '{}'", id);
+        userRepo.deleteById(id);
+    }
+
 }

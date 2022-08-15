@@ -21,48 +21,55 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
 public class IndexController {
-	
-	@Autowired
-	private UserService userService;
-	
-	private int pageSize = 10;
-	
-	@GetMapping("/login")
-	public String showLoginPage() {
-		log.info("Show login page");
-		return "login";
-	}
-	
-	@GetMapping("/")
-	public String showUserPage(@AuthenticationPrincipal UserDetailsImpl authUser, Model model) {
-		User loginedUser = userService.findByUsername(authUser.getUsername());
-		model.addAttribute("loginedUser", loginedUser);
-		log.info("Show homepage for user with id '{}'", authUser.getId());
-		return "userPage";
-	}
-	
-	@GetMapping("/admin/users/{pageNum}")
-	public String showAdminPage(@AuthenticationPrincipal UserDetailsImpl authUser,
-								@PathVariable int pageNum,
-								@RequestParam(defaultValue = "username") String sortField,
-								@RequestParam(defaultValue = "true") String sortAsc,
-								Model model) {
-		User loginedUser = userService.findByUsername(authUser.getUsername());
-		model.addAttribute("loginedUser", loginedUser);
 
-		Sort sort = sortAsc.equals("true") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();	
-		Pageable pageable = PageRequest.of(pageNum - 1, pageSize, sort); 
-		Page<User> page = userService.findAll(pageable);
+    @Autowired
+    private UserService userService;
 
-		model.addAttribute("users", page.getContent());
-		model.addAttribute("currentPage", pageNum);
-		model.addAttribute("totalPages", page.getTotalPages());
-		
-		model.addAttribute("sortField", sortField);
-		model.addAttribute("sortAsc", sortAsc);
-		
-		log.info("Show adminPage for user with id '{}', pageNumber = '{}', sortField = '{}', sortAsc = '{}'", authUser.getId(), pageNum, sortField, sortAsc);
-		return "adminPage";
-	}
-	
+    private int pageSize = 10;
+
+    @GetMapping("/login")
+    public String showLoginPage() {
+        log.info("Show login page");
+        return "login";
+    }
+
+    @GetMapping("/")
+    public String showUserPage(@AuthenticationPrincipal UserDetailsImpl authUser, Model model) {
+        User loginedUser = userService.findByUsername(authUser.getUsername());
+        model.addAttribute("loginedUser", loginedUser);
+        log.info("Show homepage for user with id '{}'", authUser.getId());
+        return "userPage";
+    }
+
+    @GetMapping("/admin/users/{pageNum}")
+    public String showAdminPage(@AuthenticationPrincipal UserDetailsImpl authUser,
+                                @PathVariable int pageNum,
+                                @RequestParam(defaultValue = "username") String sortField,
+                                @RequestParam(defaultValue = "true") String sortAsc,
+                                Model model) {
+        User loginedUser = userService.findByUsername(authUser.getUsername());
+        model.addAttribute("loginedUser", loginedUser);
+
+        Sort sort = sortAsc.equals("true")
+                ? Sort.by(sortField).ascending()
+                : Sort.by(sortField).descending();
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize, sort);
+        Page<User> page = userService.findAll(pageable);
+
+        model.addAttribute("users", page.getContent());
+        model.addAttribute("currentPage", pageNum);
+        model.addAttribute("totalPages", page.getTotalPages());
+
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortAsc", sortAsc);
+
+        log.info("Show adminPage for user with id '{}', pageNumber = '{}', sortField = '{}', sortAsc = '{}'",
+                authUser.getId(),
+                pageNum,
+                sortField,
+                sortAsc);
+
+        return "adminPage";
+    }
+
 }

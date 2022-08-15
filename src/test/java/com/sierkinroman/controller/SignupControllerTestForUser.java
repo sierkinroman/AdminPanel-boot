@@ -26,57 +26,58 @@ import com.sierkinroman.service.UserService;
 @TestPropertySource("/application-test.properties")
 class SignupControllerTestForUser {
 
-	@Autowired
+    @Autowired
     private MockMvc mockMvc;
-	
-	@Autowired
-	private UserService userService;
-	
-	@Test
-	public void testShowSignup() throws Exception {
-		this.mockMvc.perform(get("/signup"))
-			.andExpect(status().isOk())
-			.andExpect(unauthenticated())
-			.andExpect(xpath("/html/body/div/form/p[1]").string("Sign up"))
-			.andExpect(xpath("//div[@id='roles_wrapper']").doesNotExist());;
-	}
-	
-	@Test
-	public void testCorrectSignup() throws Exception {
-		UserSignupDto userSignupDto = new UserSignupDto("user100",
-												"123456",
-												"123456",
-												"user100@gmail.com",
-												"User100",
-												"UserLN100",
-												null);
-		this.mockMvc.perform(post("/signup").flashAttr("userSignupDto", userSignupDto).with(csrf()))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(unauthenticated())
-			.andExpect(view().name("redirect:/login"));
-		
-		User registeredUser = userService.findByUsername("user100");
-		
-		assertThat(registeredUser).isNotNull();
-		assertThat(registeredUser.getRoles()).contains(new Role("ROLE_USER"));
-	}
-	
-	@Test
-	public void testInvalidSignup() throws Exception {
-		UserSignupDto userSignupDto = new UserSignupDto("user1",
-												"123456",
-												"1234567",
-												"user1@gmail.com",
-												"User1",
-												"UserLN1",
-												null);
-		this.mockMvc.perform(post("/signup").flashAttr("userSignupDto", userSignupDto).with(csrf()))
-			.andExpect(status().isOk())
-			.andExpect(unauthenticated())
-			.andExpect(view().name("signup"))
-			.andExpect(xpath("/html/body/div/form/p[3]").string("*Username is used"))
-			.andExpect(xpath("/html/body/div/form/p[6]").string("*Confirm password is wrong"))
-			.andExpect(xpath("/html/body/div/form/p[8]").string("*E-mail is used"));
-	}
+
+    @Autowired
+    private UserService userService;
+
+    @Test
+    public void testShowSignup() throws Exception {
+        this.mockMvc.perform(get("/signup"))
+                .andExpect(status().isOk())
+                .andExpect(unauthenticated())
+                .andExpect(xpath("/html/body/div/form/p[1]").string("Sign up"))
+                .andExpect(xpath("//div[@id='roles_wrapper']").doesNotExist())
+        ;
+    }
+
+    @Test
+    public void testCorrectSignup() throws Exception {
+        UserSignupDto userSignupDto = new UserSignupDto("user100",
+                "123456",
+                "123456",
+                "user100@gmail.com",
+                "User100",
+                "UserLN100",
+                null);
+        this.mockMvc.perform(post("/signup").flashAttr("userSignupDto", userSignupDto).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(unauthenticated())
+                .andExpect(view().name("redirect:/login"));
+
+        User registeredUser = userService.findByUsername("user100");
+
+        assertThat(registeredUser).isNotNull();
+        assertThat(registeredUser.getRoles()).contains(new Role("ROLE_USER"));
+    }
+
+    @Test
+    public void testInvalidSignup() throws Exception {
+        UserSignupDto userSignupDto = new UserSignupDto("user1",
+                "123456",
+                "1234567",
+                "user1@gmail.com",
+                "User1",
+                "UserLN1",
+                null);
+        this.mockMvc.perform(post("/signup").flashAttr("userSignupDto", userSignupDto).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(unauthenticated())
+                .andExpect(view().name("signup"))
+                .andExpect(xpath("/html/body/div/form/p[3]").string("*Username is used"))
+                .andExpect(xpath("/html/body/div/form/p[6]").string("*Confirm password is wrong"))
+                .andExpect(xpath("/html/body/div/form/p[8]").string("*E-mail is used"));
+    }
 
 }

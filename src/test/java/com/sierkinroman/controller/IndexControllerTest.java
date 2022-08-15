@@ -22,55 +22,55 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestPropertySource("/application-test.properties")
 @WithUserDetails(value = "admin")
 public class IndexControllerTest {
-	
-	@Autowired
+
+    @Autowired
     private MockMvc mockMvc;
 
-	@Test
-	public void testShowUserPage() throws Exception {
-		this.mockMvc.perform(get("/"))
-			.andExpect(status().isOk())
-			.andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
-			.andExpect(xpath("/html/body/div[1]/p/span").string("admin"));
-	}
+    @Test
+    public void testShowUserPage() throws Exception {
+        this.mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
+                .andExpect(xpath("/html/body/div[1]/p/span").string("admin"));
+    }
 
-	@Test
-	@WithAnonymousUser
-	public void testShowLoginPage() throws Exception {
-		this.mockMvc.perform(get("/login"))
-			.andExpect(status().isOk())
-			.andExpect(unauthenticated())
-			.andExpect(view().name("login"));
-	}
+    @Test
+    @WithAnonymousUser
+    public void testShowLoginPage() throws Exception {
+        this.mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(unauthenticated())
+                .andExpect(view().name("login"));
+    }
 
-	@Test
-	public void testShowAdminPage() throws Exception {
-		this.mockMvc.perform(get("/admin/users/1"))
-			.andExpect(status().isOk())
-			.andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
-			.andExpect(xpath("/html/body/table").exists());
-	}
-	
-	@Test
-	public void testShowAdminPage_SortUsernameAsc() throws Exception {
-		this.mockMvc.perform(get("/admin/users/1").queryParam("sortField", "username").queryParam("sortAsc", "true"))
-			.andExpect(status().isOk())
-			.andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
-			.andExpect(request().attribute("sortField", "username"))
-			.andExpect(request().attribute("sortAsc", "true"))
-			.andExpect(xpath("/html/body/table").exists())
-			.andExpect(xpath("/html/body/table/tr[2]/td[1]").string("admin"));
-	}
-	
-	@Test
-	public void testShowAdminPage_SortUsernameDesc() throws Exception {
-		this.mockMvc.perform(get("/admin/users/1").queryParam("sortField", "username").queryParam("sortAsc", "false"))
-			.andExpect(status().isOk())
-			.andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
-			.andExpect(request().attribute("sortField", "username"))
-			.andExpect(request().attribute("sortAsc", "false"))
-			.andExpect(xpath("/html/body/table").exists())
-			.andExpect(xpath("/html/body/table/tr[2]/td[1]").string("user9"));
-	}
+    @Test
+    public void testShowAdminPage() throws Exception {
+        this.mockMvc.perform(get("/admin/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
+                .andExpect(xpath("/html/body/table").exists());
+    }
+
+    @Test
+    public void testShowAdminPage_SortUsernameAsc() throws Exception {
+        this.mockMvc.perform(get("/admin/users/1").queryParam("sortField", "username").queryParam("sortAsc", "true"))
+                .andExpect(status().isOk())
+                .andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
+                .andExpect(request().attribute("sortField", "username"))
+                .andExpect(request().attribute("sortAsc", "true"))
+                .andExpect(xpath("/html/body/table").exists())
+                .andExpect(xpath("/html/body/table/tr[2]/td[1]").string("admin"));
+    }
+
+    @Test
+    public void testShowAdminPage_SortUsernameDesc() throws Exception {
+        this.mockMvc.perform(get("/admin/users/1").queryParam("sortField", "username").queryParam("sortAsc", "false"))
+                .andExpect(status().isOk())
+                .andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
+                .andExpect(request().attribute("sortField", "username"))
+                .andExpect(request().attribute("sortAsc", "false"))
+                .andExpect(xpath("/html/body/table").exists())
+                .andExpect(xpath("/html/body/table/tr[2]/td[1]").string("user9"));
+    }
 
 }

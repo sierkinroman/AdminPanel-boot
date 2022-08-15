@@ -26,56 +26,56 @@ import com.sierkinroman.service.UserService;
 @TestPropertySource("/application-test.properties")
 class UserControllerTestForUser {
 
-	@Autowired
+    @Autowired
     private MockMvc mockMvc;
-	
-	@Autowired
-	private UserService userService;
-	
-	@Test
-	@WithUserDetails(value = "user1")
-	public void testShowEditForm() throws Exception {
-		this.mockMvc.perform(get("/user/edit"))
-			.andExpect(status().isOk())
-			.andExpect(authenticated().withRoles("USER"))
-			.andExpect(xpath("//input[@id='username' and @value='user1']").exists())
-			.andExpect(xpath("//div[@id='roles_wrapper']").doesNotExist());
-	}
-	
-	@Test
-	@WithUserDetails(value = "user49")
-	public void testCorrectDelete() throws Exception {
-		this.mockMvc.perform(post("/user/delete").with(csrf()))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(unauthenticated())
-			.andExpect(redirectedUrl("/login"));
-	}
-	
-	@Test
-	@WithUserDetails(value = "user1")
-	public void testCorrectUpdate() throws Exception {
-		UserEditDto userEditDto = new UserEditDto(userService.findByUsername("user1"));
-		userEditDto.setEmail("user1new@gmail.com");
-		userEditDto.setFirstName("newFirstName");
-		userEditDto.setLastName("newLastName");
-		
-		this.mockMvc.perform(post("/user/edit").flashAttr("userEditDto", userEditDto).with(csrf()))
-			.andExpect(status().is3xxRedirection())
-			.andExpect(authenticated().withRoles("USER"))
-			.andExpect(redirectedUrl("/"));
-	}
-	
-	@Test
-	@WithUserDetails(value = "user1")
-	public void testIncorrectUpdate() throws Exception {
-		UserEditDto userEditDto = new UserEditDto(userService.findByUsername("user1"));
-		userEditDto.setEmail("user2@gmail.com");
-		
-		this.mockMvc.perform(post("/user/edit").flashAttr("userEditDto", userEditDto).with(csrf()))
-			.andExpect(status().isOk())
-			.andExpect(authenticated().withRoles("USER"))
-			.andExpect(view().name("userEdit"))
-			.andExpect(xpath("/html/body/div/form/p[4]").string("*E-mail is used"));
-	}
+
+    @Autowired
+    private UserService userService;
+
+    @Test
+    @WithUserDetails(value = "user1")
+    public void testShowEditForm() throws Exception {
+        this.mockMvc.perform(get("/user/edit"))
+                .andExpect(status().isOk())
+                .andExpect(authenticated().withRoles("USER"))
+                .andExpect(xpath("//input[@id='username' and @value='user1']").exists())
+                .andExpect(xpath("//div[@id='roles_wrapper']").doesNotExist());
+    }
+
+    @Test
+    @WithUserDetails(value = "user49")
+    public void testCorrectDelete() throws Exception {
+        this.mockMvc.perform(post("/user/delete").with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(unauthenticated())
+                .andExpect(redirectedUrl("/login"));
+    }
+
+    @Test
+    @WithUserDetails(value = "user1")
+    public void testCorrectUpdate() throws Exception {
+        UserEditDto userEditDto = new UserEditDto(userService.findByUsername("user1"));
+        userEditDto.setEmail("user1new@gmail.com");
+        userEditDto.setFirstName("newFirstName");
+        userEditDto.setLastName("newLastName");
+
+        this.mockMvc.perform(post("/user/edit").flashAttr("userEditDto", userEditDto).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated().withRoles("USER"))
+                .andExpect(redirectedUrl("/"));
+    }
+
+    @Test
+    @WithUserDetails(value = "user1")
+    public void testIncorrectUpdate() throws Exception {
+        UserEditDto userEditDto = new UserEditDto(userService.findByUsername("user1"));
+        userEditDto.setEmail("user2@gmail.com");
+
+        this.mockMvc.perform(post("/user/edit").flashAttr("userEditDto", userEditDto).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(authenticated().withRoles("USER"))
+                .andExpect(view().name("userEdit"))
+                .andExpect(xpath("/html/body/div/form/p[4]").string("*E-mail is used"));
+    }
 
 }

@@ -5,7 +5,7 @@
 }
 
 body {
-    background: linear-gradient( to right, #D7D9A3, #5DA6A6, #CACEB5);
+    background: linear-gradient(to right, #D7D9A3, #5DA6A6, #CACEB5);
     background-size: 400% 400%;
     animation: body 25s infinite ease-in-out;
     font-family: 'Poppins', sans-serif;
@@ -14,13 +14,13 @@ body {
 }
 
 @keyframes body {
-    0%{
+    0% {
         background-position: 0 50%;
     }
-    50%{
+    50% {
         background-position: 100% 50%;
     }
-    100%{
+    100% {
         background-position: 0 50%;
     }
 }
@@ -77,7 +77,7 @@ body {
     font-size: 14px;
     line-height: 36px;
     background-color: #A1C484;
-    border: 0px; 
+    border: 0px;
     cursor: pointer;
     margin: 10px 0 0 0;
     border-radius: 5px;

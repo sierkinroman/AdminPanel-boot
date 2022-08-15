@@ -12,47 +12,46 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.sierkinroman.service.impl.userdetails.UserDetailsServiceImpl;
 
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	
-	@Autowired
-	private UserDetailsServiceImpl userDetailsServiceImpl;
-	
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsServiceImpl;
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
-	
 
-	@Override
+
+    @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-        	.userDetailsService(userDetailsServiceImpl)
-        	.passwordEncoder(bCryptPasswordEncoder());
+                .userDetailsService(userDetailsServiceImpl)
+                .passwordEncoder(bCryptPasswordEncoder());
     }
-	
-	@Override
-	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		// TODO configure correctly 
-		httpSecurity
-			.authorizeRequests()
-            	.antMatchers("/css/**","/js/**", "/images/**").permitAll()
-//				.antMatchers("/", "/logout").hasAnyRole("USER", "ADMIN")
-				.antMatchers("/admin/**").hasRole("ADMIN")
-				.antMatchers("/signup", "/login").anonymous()
-				.anyRequest().authenticated()
-			.and()
-				.formLogin()
-				.loginPage("/login")
-				.defaultSuccessUrl("/", true)
-				.failureUrl("/login?error=true")
-			.and()
-				.logout()
-				.logoutUrl("/logout")
-				.logoutSuccessUrl("/login")
-		;
-	}
+
+    @Override
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
+        // TODO configure correctly
+        httpSecurity
+                .authorizeRequests()
+                    .antMatchers("/css/**", "/js/**", "/images/**").permitAll()
+//				    .antMatchers("/", "/logout").hasAnyRole("USER", "ADMIN")
+                    .antMatchers("/admin/**").hasRole("ADMIN")
+                    .antMatchers("/signup", "/login").anonymous()
+                    .anyRequest().authenticated()
+                .and()
+                    .formLogin()
+                    .loginPage("/login")
+                    .defaultSuccessUrl("/", true)
+                    .failureUrl("/login?error=true")
+                .and()
+                    .logout()
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/login")
+        ;
+    }
 
 }

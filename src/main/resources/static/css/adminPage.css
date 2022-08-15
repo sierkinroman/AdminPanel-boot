@@ -5,7 +5,7 @@
 }
 
 body {
-    background: linear-gradient( to right, #D7D9A3, #5DA6A6, #CACEB5);
+    background: linear-gradient(to right, #D7D9A3, #5DA6A6, #CACEB5);
     background-size: 400% 400%;
     animation: body 25s infinite ease-in-out;
     color: rgb(56, 56, 56);
@@ -14,13 +14,13 @@ body {
 }
 
 @keyframes body {
-    0%{
+    0% {
         background-position: 0 50%;
     }
-    50%{
+    50% {
         background-position: 100% 50%;
     }
-    1000%{
+    1000% {
         background-position: 0 50%;
     }
 }
@@ -126,7 +126,7 @@ body {
 }
 
 .table_header a.sort_desc:after {
-    content: "\25BC"; 
+    content: "\25BC";
 }
 
 .cell {
@@ -140,10 +140,10 @@ body {
 }
 
 .cell span:last-child {
-	display: none;
+    display: none;
 }
 
-.cell a{
+.cell a {
     color: rgb(56, 56, 56);
     border-radius: 5px;
     padding: 0 10px;
@@ -155,7 +155,7 @@ body {
     text-decoration: none;
 }
 
-.cell a:hover{
+.cell a:hover {
     background-color: #d7da5c;
 }
 
@@ -203,7 +203,7 @@ tr:nth-child(n + 2):hover:after {
 }
 
 .pagination {
-    text-align: center; 
+    text-align: center;
     display: flex;
     justify-content: center;
     margin: 20px;
@@ -222,19 +222,19 @@ tr:nth-child(n + 2):hover:after {
 }
 
 .pagination .page_link:hover {
-    background-color: #3c6d8a; 
+    background-color: #3c6d8a;
     color: #f3f4f2;
 }
 
 .pagination .current_page {
-    background-color: #16425b; 
+    background-color: #16425b;
     border-radius: 4px;
     color: #f3f4f2;
     cursor: default;
 }
 
 .pagination .current_page:hover {
-    background-color: #16425b; 
+    background-color: #16425b;
 }
 
 #modal {
@@ -297,8 +297,8 @@ tr:nth-child(n + 2):hover:after {
     position: absolute;
     top: 15px;
     right: 15px;
-	height: 24px;
-	display: flex;
+    height: 24px;
+    display: flex;
     justify-content: center;
     align-items: center;
 }
