@@ -46,6 +46,7 @@
                 <input type="checkbox" name="roles" th:field="*{roles}" th:value="${role.id}"/><span
                     th:text="${role.name}">role</span>
             </div>
+            <p th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}" class="invalid_field"></p>
         </div>
 
         <input type="submit" th:value="${#authorization.expression('isAuthenticated()')} ? 'ADD USER' : 'SIGN UP'"

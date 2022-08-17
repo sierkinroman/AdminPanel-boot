@@ -54,7 +54,7 @@ public class SignupController {
                           BindingResult bindingResult,
                           Model model) {
         // check validation errors
-        rejectFieldsIfNotValid(userSignupDto, bindingResult);
+        rejectFieldsIfNotValidForAdmin(userSignupDto, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("listRoles", roleService.findAll());
             log.info("Presents validation error - '{}'", bindingResult.getAllErrors());
@@ -68,6 +68,14 @@ public class SignupController {
 
         log.info("Admin registered a new user with username '{}'", savedUser.getUsername());
         return "redirect:" + previousPage;
+    }
+
+    private void rejectFieldsIfNotValidForAdmin(UserSignupDto userSignupDto, BindingResult bindingResult) {
+        rejectFieldsIfNotValid(userSignupDto, bindingResult);
+        if (userSignupDto.getRoles().isEmpty()) {
+            log.info("Reject empty roles");
+            bindingResult.rejectValue("roles", "roleEmpty");
+        }
     }
 
     private void rejectFieldsIfNotValid(UserSignupDto userSignupDto, BindingResult bindingResult) {

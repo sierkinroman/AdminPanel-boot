@@ -38,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 
     // TODO change color and transparent in toastr
-    // TODO while edit user, user' role can't be empty (or default ROLE_USER)
 
     @Autowired
     private UserService userService;
@@ -95,6 +94,10 @@ public class UserController {
 
         // check validation errors
         rejectEmailIfExists(userEditDto, id, bindingResult);
+        if (userEditDto.getRoles().isEmpty()) {
+            log.info("Reject empty roles");
+            bindingResult.rejectValue("roles", "roleEmpty");
+        }
         if (bindingResult.hasErrors()) {
             model.addAttribute("listRoles", roleService.findAll());
             log.info("Presents validation error - '{}'", bindingResult.getAllErrors());

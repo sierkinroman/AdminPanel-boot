@@ -31,7 +31,6 @@ public class UserEditDto {
     @NotBlank(message = "*Last name is required")
     private String lastName;
 
-    // TODO maybe set to NotEmpty (user may not be without role)
     private Set<Role> roles;
 
     public UserEditDto(String username, String email, String firstName, String lastName) {
