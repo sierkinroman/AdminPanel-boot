@@ -179,4 +179,17 @@ class UserControllerTestForAdmin {
                 .andExpect(xpath("//div[@id='roles_wrapper']").doesNotExist());
     }
 
+    @Test
+    @WithUserDetails(value = "admin")
+    public void testIncorrectUpdate_EmptyRoles() throws Exception {
+        User admin = userService.findByUsername("admin");
+        UserEditDto emptyRolesEditDto = new UserEditDto(admin);
+        emptyRolesEditDto.setRoles(Collections.emptySet());
+
+        this.mockMvc.perform(post("/admin/{id}/edit", admin.getId()).flashAttr("userEditDto", emptyRolesEditDto).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(authenticated().withRoles("ADMIN"))
+                .andExpect(xpath("//div[@id='roles_wrapper']/p[2]").string("Role can't be empty"));
+    }
+
 }

@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,8 +60,9 @@ class SignupControllerTestForAdmin {
                 "admin100@gmail.com",
                 "Admin100",
                 "AdminLN100",
-                getRoles("ROLE_ADMIN"));
+                Collections.singleton(roleService.findByName("ROLE_ADMIN")));
         String refererUrl = "http://localhost:8080/admin/users/1?sortField=username&sortAsc=true";
+
         this.mockMvc.perform(get("/admin/addUser").header("Referer", refererUrl));
 
         this.mockMvc.perform(post("/admin/addUser").flashAttr("userSignupDto", userSignupDto).with(csrf()))
@@ -75,12 +77,6 @@ class SignupControllerTestForAdmin {
         userService.deleteById(addedUser.getId());
     }
 
-    private Set<Role> getRoles(String role) {
-        HashSet<Role> roles = new HashSet<>();
-        roles.add(roleService.findByName(role));
-        return roles;
-    }
-
     @Test
     public void testInvalidAddUser() throws Exception {
         User persistedUser = userService.findByUsername("user1");
@@ -90,7 +86,7 @@ class SignupControllerTestForAdmin {
                 persistedUser.getEmail(),
                 persistedUser.getFirstName(),
                 persistedUser.getLastName(),
-                persistedUser.getRoles());
+                Collections.emptySet());
 
         this.mockMvc.perform(post("/admin/addUser").flashAttr("userSignupDto", userSignupDto).with(csrf()))
                 .andExpect(status().isOk())
@@ -99,6 +95,7 @@ class SignupControllerTestForAdmin {
                 .andExpect(xpath("/html/body/div/form/p[3]").string("*Username is used"))
                 .andExpect(xpath("/html/body/div/form/p[6]").string("*Confirm password is wrong"))
                 .andExpect(xpath("/html/body/div/form/p[8]").string("*E-mail is used"))
+                .andExpect(xpath("//div[@id='roles_wrapper']/p[2]").string("Role can't be empty"))
                 .andExpect(xpath("//div[@id='roles_wrapper']").exists());
     }
 
