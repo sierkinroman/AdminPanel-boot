@@ -11,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.sierkinroman.service.impl.userdetails.UserDetailsServiceImpl;
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -34,11 +33,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        // TODO configure correctly
         httpSecurity
                 .authorizeRequests()
                     .antMatchers("/css/**", "/js/**", "/images/**").permitAll()
-//				    .antMatchers("/", "/logout").hasAnyRole("USER", "ADMIN")
                     .antMatchers("/admin/**").hasRole("ADMIN")
                     .antMatchers("/signup", "/login").anonymous()
                     .anyRequest().authenticated()

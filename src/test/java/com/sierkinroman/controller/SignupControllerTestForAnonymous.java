@@ -24,7 +24,7 @@ import com.sierkinroman.service.UserService;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
-class SignupControllerTestForUser {
+class SignupControllerTestForAnonymous {
 
     @Autowired
     private MockMvc mockMvc;
