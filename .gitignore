@@ -3,6 +3,7 @@ target/
 !**/src/test/**/target/
 logs/
 *.log
+db/
 
 ### STS ###
 .apt_generated
