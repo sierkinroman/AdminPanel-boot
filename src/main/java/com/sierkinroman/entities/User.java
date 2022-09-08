@@ -1,7 +1,13 @@
 package com.sierkinroman.entities;
 
-import java.util.Objects;
-import java.util.Set;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,14 +19,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import lombok.*;
+import java.util.Set;
 
 @Builder
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
+@Getter
+@Setter
+@EqualsAndHashCode(exclude = {"id"}, doNotUseGetters = true)
+@ToString(exclude = {"id"}, doNotUseGetters = true)
 @Entity
 @Table(name = "user")
 public class User {
@@ -51,33 +58,5 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(email, firstName, lastName, password, roles, username);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        User other = (User) obj;
-        return Objects.equals(email, other.email) && Objects.equals(firstName, other.firstName)
-                && Objects.equals(lastName, other.lastName) && Objects.equals(password, other.password)
-                && Objects.equals(roles, other.roles) && Objects.equals(username, other.username);
-    }
-
-    @Override
-    public String toString() {
-        return "User [username=" + username + ", password=" + password + ", email=" + email + ", firstName=" + firstName
-                + ", lastName=" + lastName + ", roles=" + roles + "]";
-    }
 
 }
