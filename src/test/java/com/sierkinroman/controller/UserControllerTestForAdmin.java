@@ -49,12 +49,14 @@ class UserControllerTestForAdmin {
 
     @BeforeEach
     public void setup() {
-        User admin2 = new User("admin2",
-                bCryptPasswordEncoder.encode("123456"),
-                "admin2@gmail.com",
-                "Admin2",
-                "AdminLN2",
-                Collections.singleton(roleService.findByName("ROLE_ADMIN")));
+        User admin2 = User.builder()
+                .username("admin2")
+                .password(bCryptPasswordEncoder.encode("123456"))
+                .email("admin2@gmail.com")
+                .firstName("Admin2")
+                .lastName("AdminLN2")
+                .roles(Collections.singleton(roleService.findByName("ROLE_ADMIN")))
+                .build();
         userService.save(admin2);
     }
 

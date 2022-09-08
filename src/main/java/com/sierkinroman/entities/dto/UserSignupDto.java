@@ -44,12 +44,14 @@ public class UserSignupDto {
     private Set<Role> roles;
 
     public User getUser(BCryptPasswordEncoder bCryptPasswordEncoder, RoleService roleService) {
-        return new User(username,
-                        bCryptPasswordEncoder.encode(password),
-                        email,
-                        firstName,
-                        lastName,
-                        Collections.singleton(roleService.findByName("ROLE_USER")));
+        return User.builder()
+                .username(username)
+                .password(bCryptPasswordEncoder.encode(password))
+                .email(email)
+                .firstName(firstName)
+                .lastName(lastName)
+                .roles(Collections.singleton(roleService.findByName("ROLE_USER")))
+                .build();
     }
 
 }

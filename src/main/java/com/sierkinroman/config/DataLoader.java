@@ -71,12 +71,14 @@ public class DataLoader {
                                        Set<Role> roles) {
         if (userService.findByUsername(username) == null
                 && userService.findByEmail(email) == null) {
-            User user = new User(username,
-                    bCryptPasswordEncoder.encode(password),
-                    email,
-                    firstName,
-                    lastName,
-                    roles);
+            User user = User.builder()
+                    .username(username)
+                    .password(bCryptPasswordEncoder.encode(password))
+                    .email(email)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .roles(roles)
+                    .build();
             userService.save(user);
             log.info("Created User with username - '{}'", username);
         }
