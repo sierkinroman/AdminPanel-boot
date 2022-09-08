@@ -31,6 +31,8 @@ public class UserEditDto {
     @NotBlank(message = "*Last name is required")
     private String lastName;
 
+    private boolean enabled = true;
+
     private Set<Role> roles;
 
     public UserEditDto(String username, String email, String firstName, String lastName) {
@@ -45,6 +47,7 @@ public class UserEditDto {
         this.email = user.getEmail();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
+        this.enabled = user.isEnabled();
         this.roles = user.getRoles();
     }
 

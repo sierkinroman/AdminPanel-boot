@@ -62,4 +62,12 @@ public class LoginTest {
                 .andExpect(redirectedUrl("/login?error=true"));
     }
 
+    @Test
+    public void loginBlockedUserTest() throws Exception {
+        this.mockMvc.perform(formLogin().user("user1").password("user1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(unauthenticated())
+                .andExpect(redirectedUrl("/login?error=true"));
+    }
+
 }

@@ -50,6 +50,7 @@ class SignupControllerTestForAnonymous {
                 "user100@gmail.com",
                 "User100",
                 "UserLN100",
+                true,
                 null);
         this.mockMvc.perform(post("/signup").flashAttr("userSignupDto", userSignupDto).with(csrf()))
                 .andExpect(status().is3xxRedirection())
@@ -70,6 +71,7 @@ class SignupControllerTestForAnonymous {
                 "user1@gmail.com",
                 "User1",
                 "UserLN1",
+                true,
                 null);
         this.mockMvc.perform(post("/signup").flashAttr("userSignupDto", userSignupDto).with(csrf()))
                 .andExpect(status().isOk())

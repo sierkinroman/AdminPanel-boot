@@ -1,5 +1,20 @@
 package com.sierkinroman.controller;
 
+import com.sierkinroman.entities.Role;
+import com.sierkinroman.entities.User;
+import com.sierkinroman.entities.dto.UserSignupDto;
+import com.sierkinroman.service.RoleService;
+import com.sierkinroman.service.UserService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
@@ -9,24 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-
-import com.sierkinroman.entities.Role;
-import com.sierkinroman.entities.User;
-import com.sierkinroman.entities.dto.UserSignupDto;
-import com.sierkinroman.service.RoleService;
-import com.sierkinroman.service.UserService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -60,22 +57,53 @@ class SignupControllerTestForAdmin {
                 "admin100@gmail.com",
                 "Admin100",
                 "AdminLN100",
+                true,
                 Collections.singleton(roleService.findByName("ROLE_ADMIN")));
-        String refererUrl = "http://localhost:8080/admin/users/1?sortField=username&sortAsc=true";
 
-        this.mockMvc.perform(get("/admin/addUser").header("Referer", refererUrl));
+        this.mockMvc.perform(get("/admin/addUser").header("Referer", getRefererUrl()));
 
         this.mockMvc.perform(post("/admin/addUser").flashAttr("userSignupDto", userSignupDto).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated())
-                .andExpect(redirectedUrl(refererUrl));
+                .andExpect(redirectedUrl(getRefererUrl()));
 
         User addedUser = userService.findByUsername("admin100");
         assertThat(addedUser).isNotNull();
+        assertThat(addedUser.isEnabled()).isTrue();
         assertThat(addedUser.getRoles()).contains(new Role("ROLE_ADMIN"));
 
         userService.deleteById(addedUser.getId());
     }
+
+    private String getRefererUrl() {
+        return "http://localhost:8080/admin/users/1?sortField=username&sortAsc=true";
+    }
+
+//    @Test
+//    public void testCorrectAddDisabledUser() throws Exception {
+//        UserSignupDto userSignupDto = new UserSignupDto("admin100",
+//                "123456",
+//                "123456",
+//                "admin100@gmail.com",
+//                "Admin100",
+//                "AdminLN100",
+//                false,
+//                Collections.singleton(roleService.findByName("ROLE_ADMIN")));
+//
+//        this.mockMvc.perform(get("/admin/addUser").header("Referer", getRefererUrl()));
+//
+//        this.mockMvc.perform(post("/admin/addUser").flashAttr("userSignupDto", userSignupDto).with(csrf()))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(authenticated())
+//                .andExpect(redirectedUrl(getRefererUrl()));
+//
+//        User addedUser = userService.findByUsername("admin100");
+//        assertThat(addedUser).isNotNull();
+//        assertThat(addedUser.isEnabled()).isFalse();
+//        assertThat(addedUser.getRoles()).contains(new Role("ROLE_ADMIN"));
+//
+//        userService.deleteById(addedUser.getId());
+//    }
 
     @Test
     public void testInvalidAddUser() throws Exception {
@@ -86,6 +114,7 @@ class SignupControllerTestForAdmin {
                 persistedUser.getEmail(),
                 persistedUser.getFirstName(),
                 persistedUser.getLastName(),
+                persistedUser.isEnabled(),
                 Collections.emptySet());
 
         this.mockMvc.perform(post("/admin/addUser").flashAttr("userSignupDto", userSignupDto).with(csrf()))

@@ -1,17 +1,10 @@
 package com.sierkinroman.controller;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
-
-import java.util.Collections;
-import java.util.HashSet;
-
+import com.sierkinroman.entities.Role;
+import com.sierkinroman.entities.User;
+import com.sierkinroman.entities.dto.UserEditDto;
+import com.sierkinroman.service.RoleService;
+import com.sierkinroman.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,11 +17,18 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.sierkinroman.entities.Role;
-import com.sierkinroman.entities.User;
-import com.sierkinroman.entities.dto.UserEditDto;
-import com.sierkinroman.service.RoleService;
-import com.sierkinroman.service.UserService;
+import java.util.Collections;
+import java.util.HashSet;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,6 +55,7 @@ class UserControllerTestForAdmin {
                 .email("admin2@gmail.com")
                 .firstName("Admin2")
                 .lastName("AdminLN2")
+                .enabled(true)
                 .roles(Collections.singleton(roleService.findByName("ROLE_ADMIN")))
                 .build();
         userService.save(admin2);
@@ -192,6 +193,60 @@ class UserControllerTestForAdmin {
                 .andExpect(status().isOk())
                 .andExpect(authenticated().withRoles("ADMIN"))
                 .andExpect(xpath("//div[@id='roles_wrapper']/p[2]").string("Role can't be empty"));
+    }
+
+    @Test
+    @WithUserDetails(value = "admin")
+    public void testCorrectUpdate_DisableUser() throws Exception {
+        User admin2 = userService.findByUsername("admin2");
+        UserEditDto disabledEditDto = new UserEditDto(admin2);
+        disabledEditDto.setEnabled(false);
+
+        this.mockMvc.perform(get("/admin/{id}/edit", admin2.getId()).header("Referer", getRefererUrl()));
+
+        this.mockMvc.perform(post("/admin/{id}/edit", admin2.getId()).flashAttr("userEditDto", disabledEditDto).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated().withRoles("ADMIN"))
+                .andExpect(redirectedUrl(getRefererUrl()));
+
+        assertThat(userService.findByUsername("admin2").isEnabled()).isFalse();
+
+
+//        this.mockMvc.perform(formLogin().user(admin2.getUsername()).password(admin2.getPassword()))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(unauthenticated())
+//                .andExpect(redirectedUrl("/login?error=true"));
+
+//        this.mockMvc.perform(post("/logout").with(csrf()))
+//                .andExpect(unauthenticated());
+//
+//        this.mockMvc.perform(get("/login"))
+//                .andExpect(status().isOk())
+//                .andExpect(unauthenticated());
+//
+//        this.mockMvc.perform(post("/login").param("username", admin2.getUsername()).param("password", admin2.getPassword()))
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(unauthenticated())
+//                .andExpect(redirectedUrl("/login?error=true"));
+    }
+
+    @Test
+    @WithUserDetails(value = "admin")
+    public void testCorrectUpdate_EnableUser() throws Exception {
+        User user2 = userService.findByUsername("user2");
+        assertThat(user2.isEnabled()).isFalse();
+
+        UserEditDto enabledEditDto = new UserEditDto(user2);
+        enabledEditDto.setEnabled(true);
+
+        this.mockMvc.perform(get("/admin/{id}/edit", user2.getId()).header("Referer", getRefererUrl()));
+
+        this.mockMvc.perform(post("/admin/{id}/edit", user2.getId()).flashAttr("userEditDto", enabledEditDto).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated().withRoles("ADMIN"))
+                .andExpect(redirectedUrl(getRefererUrl()));
+
+        assertThat(userService.findByUsername("user2").isEnabled()).isTrue();
     }
 
 }

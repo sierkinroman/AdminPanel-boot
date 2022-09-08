@@ -41,6 +41,8 @@ public class UserSignupDto {
     @NotBlank(message = "*Last name is required")
     private String lastName;
 
+    private boolean enabled = true;
+
     private Set<Role> roles;
 
     public User getUser(BCryptPasswordEncoder bCryptPasswordEncoder, RoleService roleService) {
@@ -50,6 +52,7 @@ public class UserSignupDto {
                 .email(email)
                 .firstName(firstName)
                 .lastName(lastName)
+                .enabled(enabled)
                 .roles(Collections.singleton(roleService.findByName("ROLE_USER")))
                 .build();
     }
