@@ -56,8 +56,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        // TODO add possibility to block user
-        return true;
+        return user.isEnabled();
     }
 
     public long getId() {

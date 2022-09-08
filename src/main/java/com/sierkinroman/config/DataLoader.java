@@ -40,17 +40,29 @@ public class DataLoader {
                 "admin@gmail.com",
                 "Admin",
                 "Admin",
+                true,
                 Collections.singleton(roleService.findByName("ROLE_ADMIN")));
 
         Set<Role> roleUser = Collections.singleton(roleService.findByName("ROLE_USER"));
         int countUser = 49;
         for (int i = 1; i <= countUser; i++) {
-            createUserIfNotExists("user" + i,
-                    "user" + i,
-                    "user" + i + "@gmail.com",
-                    "User" + i,
-                    "UserLN" + i,
-                    roleUser);
+            if (i < 10) {
+                createUserIfNotExists("user" + i,
+                        "user" + i,
+                        "user" + i + "@gmail.com",
+                        "User" + i,
+                        "UserLN" + i,
+                        false,
+                        roleUser);
+            } else {
+                createUserIfNotExists("user" + i,
+                        "user" + i,
+                        "user" + i + "@gmail.com",
+                        "User" + i,
+                        "UserLN" + i,
+                        true,
+                        roleUser);
+            }
         }
         log.info("Initial data has loaded in database");
     }
@@ -68,6 +80,7 @@ public class DataLoader {
                                        String email,
                                        String firstName,
                                        String lastName,
+                                       boolean enabled,
                                        Set<Role> roles) {
         if (userService.findByUsername(username) == null
                 && userService.findByEmail(email) == null) {
@@ -77,6 +90,7 @@ public class DataLoader {
                     .email(email)
                     .firstName(firstName)
                     .lastName(lastName)
+                    .enabled(enabled)
                     .roles(roles)
                     .build();
             userService.save(user);
