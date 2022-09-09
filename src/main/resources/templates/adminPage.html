@@ -42,6 +42,7 @@
         <th class="table_header"><a
                 th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='roles', sortAsc=(${sortField} != 'roles' ? 'true' : (${sortAsc} ? 'false' : 'true')))}"
                 data-name="roles">Roles</a></th>
+        <th class="table_header">Enabled</th>
         <th class="table_header">Actions</th>
     </tr>
     <tr th:each="user : ${users}">
@@ -49,10 +50,14 @@
         <td class="cell" th:text="${user.email}">email</td>
         <td class="cell" th:text="${user.firstName}">firstName</td>
         <td class="cell" th:text="${user.lastName}">lastName</td>
-        <td class="cell">
+        <td class="cell roles_cell">
             <th:block th:each="role : ${user.roles}">
                 <span th:text="${role.name}"></span><span>,</span>
             </th:block>
+        </td>
+        <td class="cell" th:switch="${user.enabled}">
+            <span th:case="true" style="color: #088108">Enabled</span>
+            <span th:case="false" style="color: #e91717">Disabled</span>
         </td>
         <td class="cell">
             <a th:href="@{/admin/{id}/edit(id=${user.id})}">Edit</a>

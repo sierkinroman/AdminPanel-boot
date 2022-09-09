@@ -36,6 +36,11 @@
         <input type="text" name="lastName" th:field="*{lastName}" class="input_form"/>
         <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="invalid_field"></p>
 
+        <div sec:authorize="hasRole('ROLE_ADMIN')" id="enabled_wrapper">
+            <input type="checkbox" name="enabled" th:field="*{enabled}"/>
+            <span>Enabled</span>
+        </div>
+
         <!-- <p class="text_form">Role:</p>
         <select name="role" id="role" class="input_form">
             <option th:value="ROLE_USER" th:text="User" th:selected="('ROLE_USER' == *{role})"></option>

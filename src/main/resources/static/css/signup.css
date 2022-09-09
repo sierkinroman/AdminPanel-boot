@@ -87,7 +87,8 @@ body {
     background-color: #88ac6b;
 }
 
-.role {
+.role,
+#enabled_wrapper {
     margin: 5px 0;
     display: flex;
     align-items: center;
@@ -95,14 +96,16 @@ body {
     font-size: 14px;
 }
 
-.role input[type="checkbox"] {
+.role input[type="checkbox"],
+#enabled_wrapper input[type="checkbox"] {
     cursor: pointer;
     margin: 0 5px 0 0;
     width: 15px;
     height: 15px;
 }
 
-.role input[type="checkbox"]:checked {
+.role input[type="checkbox"]:checked,
+#enabled_wrapper input[type="checkbox"]:checked {
     accent-color: #A1C484;
 }
 

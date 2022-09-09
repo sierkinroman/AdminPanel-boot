@@ -139,7 +139,7 @@ body {
     border-right: none;
 }
 
-.cell span:last-child {
+.roles_cell span:last-child {
     display: none;
 }
 

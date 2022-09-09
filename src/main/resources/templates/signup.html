@@ -40,6 +40,11 @@
         <input type="text" name="lastName" th:field="*{lastName}" class="input_form"/>
         <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="invalid_field"></p>
 
+        <div sec:authorize="hasRole('ROLE_ADMIN')" id="enabled_wrapper">
+            <input type="checkbox" name="enabled" th:field="*{enabled}"/>
+            <span>Enabled</span>
+        </div>
+
         <div sec:authorize="hasRole('ROLE_ADMIN')" id="roles_wrapper">
             <p class="text_form">Roles:</p>
             <div th:each="role : ${listRoles}" class="role">
