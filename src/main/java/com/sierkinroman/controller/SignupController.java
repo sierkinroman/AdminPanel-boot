@@ -64,6 +64,7 @@ public class SignupController {
         // save new user
         User savedUser = userSignupDto.getUser(bCryptPasswordEncoder, roleService);
         savedUser.setRoles(userSignupDto.getRoles());
+        savedUser.setEnabled(userSignupDto.isEnabled());
         userService.save(savedUser);
 
         log.info("Admin registered a new user with username '{}'", savedUser.getUsername());

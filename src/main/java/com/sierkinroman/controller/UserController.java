@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 
     // TODO change color and transparent in toastr
-
+    // TODO refactor
     @Autowired
     private UserService userService;
 
@@ -109,6 +109,7 @@ public class UserController {
         updatedUser.setEmail(userEditDto.getEmail());
         updatedUser.setFirstName(userEditDto.getFirstName());
         updatedUser.setLastName(userEditDto.getLastName());
+        updatedUser.setEnabled(userEditDto.isEnabled());
         updatedUser.setRoles(userEditDto.getRoles());
         userService.update(updatedUser);
         log.info("Updated user with id '{}'", id);
