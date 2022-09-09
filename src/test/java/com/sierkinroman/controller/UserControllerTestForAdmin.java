@@ -199,8 +199,7 @@ class UserControllerTestForAdmin {
     @WithUserDetails(value = "admin")
     public void testCorrectUpdate_DisableUser() throws Exception {
         User admin2 = userService.findByUsername("admin2");
-        UserEditDto disabledEditDto = new UserEditDto(admin2);
-        disabledEditDto.setEnabled(false);
+        UserEditDto disabledEditDto = getUserEditDto(admin2, false);
 
         this.mockMvc.perform(get("/admin/{id}/edit", admin2.getId()).header("Referer", getRefererUrl()));
 
@@ -212,14 +211,18 @@ class UserControllerTestForAdmin {
         assertThat(userService.findByUsername("admin2").isEnabled()).isFalse();
     }
 
+    private UserEditDto getUserEditDto(User user, boolean enabled) {
+        UserEditDto userEditDto = new UserEditDto(user);
+        userEditDto.setEnabled(enabled);
+        return userEditDto;
+    }
+
     @Test
     @WithUserDetails(value = "admin")
     public void testCorrectUpdate_EnableUser() throws Exception {
         User user2 = userService.findByUsername("user2");
         assertThat(user2.isEnabled()).isFalse();
-
-        UserEditDto enabledEditDto = new UserEditDto(user2);
-        enabledEditDto.setEnabled(true);
+        UserEditDto enabledEditDto = getUserEditDto(user2, true);
 
         this.mockMvc.perform(get("/admin/{id}/edit", user2.getId()).header("Referer", getRefererUrl()));
 
@@ -229,6 +232,37 @@ class UserControllerTestForAdmin {
                 .andExpect(redirectedUrl(getRefererUrl()));
 
         assertThat(userService.findByUsername("user2").isEnabled()).isTrue();
+    }
+
+    @Test
+    @WithUserDetails(value = "admin")
+    public void testIncorrectDisableSelf_LastAdmin() throws Exception {
+        tearDown();
+        User admin = userService.findByUsername("admin");
+        UserEditDto disabledEditDto = getUserEditDto(admin, false);
+
+        this.mockMvc.perform(get("/admin/{id}/edit", admin.getId()).header("Referer", getRefererUrl()));
+
+        this.mockMvc.perform(post("/admin/{id}/edit", admin.getId()).flashAttr("userEditDto", disabledEditDto).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(authenticated().withRoles("ADMIN"))
+                .andExpect(redirectedUrl(getRefererUrl()));
+
+        assertThat(userService.findByUsername("admin").isEnabled()).isTrue();
+    }
+
+    @Test
+    @WithUserDetails(value = "admin")
+    public void testCorrectDisableSelf_NotLastAdmin() throws Exception {
+        User admin = userService.findByUsername("admin");
+        UserEditDto disabledEditDto = getUserEditDto(admin, false);
+
+        this.mockMvc.perform(get("/admin/{id}/edit", admin.getId()).header("Referer", getRefererUrl()));
+
+        this.mockMvc.perform(post("/admin/{id}/edit", admin.getId()).flashAttr("userEditDto", disabledEditDto).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(unauthenticated())
+                .andExpect(redirectedUrl("/login"));
     }
 
 }
