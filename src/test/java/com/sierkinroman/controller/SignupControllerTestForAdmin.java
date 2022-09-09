@@ -124,7 +124,7 @@ class SignupControllerTestForAdmin {
                 .andExpect(xpath("/html/body/div/form/p[3]").string("*Username is used"))
                 .andExpect(xpath("/html/body/div/form/p[6]").string("*Confirm password is wrong"))
                 .andExpect(xpath("/html/body/div/form/p[8]").string("*E-mail is used"))
-                .andExpect(xpath("//div[@id='roles_wrapper']/p[2]").string("Role can't be empty"))
+                .andExpect(xpath("//div[@id='roles_wrapper']/p[2]").string("*Role can't be empty"))
                 .andExpect(xpath("//div[@id='roles_wrapper']").exists());
     }
 

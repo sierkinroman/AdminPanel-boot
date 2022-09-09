@@ -192,7 +192,7 @@ class UserControllerTestForAdmin {
         this.mockMvc.perform(post("/admin/{id}/edit", admin.getId()).flashAttr("userEditDto", emptyRolesEditDto).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(authenticated().withRoles("ADMIN"))
-                .andExpect(xpath("//div[@id='roles_wrapper']/p[2]").string("Role can't be empty"));
+                .andExpect(xpath("//div[@id='roles_wrapper']/p[2]").string("*Role can't be empty"));
     }
 
     @Test
@@ -210,24 +210,6 @@ class UserControllerTestForAdmin {
                 .andExpect(redirectedUrl(getRefererUrl()));
 
         assertThat(userService.findByUsername("admin2").isEnabled()).isFalse();
-
-
-//        this.mockMvc.perform(formLogin().user(admin2.getUsername()).password(admin2.getPassword()))
-//                .andExpect(status().is3xxRedirection())
-//                .andExpect(unauthenticated())
-//                .andExpect(redirectedUrl("/login?error=true"));
-
-//        this.mockMvc.perform(post("/logout").with(csrf()))
-//                .andExpect(unauthenticated());
-//
-//        this.mockMvc.perform(get("/login"))
-//                .andExpect(status().isOk())
-//                .andExpect(unauthenticated());
-//
-//        this.mockMvc.perform(post("/login").param("username", admin2.getUsername()).param("password", admin2.getPassword()))
-//                .andExpect(status().is3xxRedirection())
-//                .andExpect(unauthenticated())
-//                .andExpect(redirectedUrl("/login?error=true"));
     }
 
     @Test
