@@ -77,9 +77,11 @@
         } else if (action === 'successDelete') {
             toastr["success"]("User was deleted successfully");
         } else if (action === 'lastAdminInvalidEdit') {
-            toastr["warning"]("Last Admin can't change self role to non Admin", "Edit isn't possible");
+            toastr["warning"]("Last enabled Admin can't change self role to non Admin", "Edit isn't possible");
         } else if (action === 'lastAdminInvalidDelete') {
             toastr["warning"]("Last Admin can't delete himself", "Delete isn't possible");
+        } else if (action === 'lastAdminDisableSelf') {
+            toastr["warning"]("Last enabled Admin can't disable himself", "Disable isn't possible");
         }
     });
 </script>

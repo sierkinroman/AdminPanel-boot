@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> findAll(Pageable pageable) {
         log.debug("Find all Users with pageable {}", pageable);
+        // TODO bug when sorting roles
         return userRepo.findAllDistinctBy(pageable);
     }
 

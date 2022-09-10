@@ -39,6 +39,7 @@ public class UserController {
 
     // TODO change color and transparent in toastr
     // TODO refactor
+    // TODO last enabled admin cant disabel change role self
     @Autowired
     private UserService userService;
 
@@ -84,12 +85,19 @@ public class UserController {
                                       Model model,
                                       RedirectAttributes redirectAttributes,
                                       HttpServletRequest request) {
-        // if Last Admin remove ROLE_ADMIN from self
-        if (id == authUser.getId()
-                && isLastAdminChangeSelfRoleToNonAdmin(userEditDto)) {
-            redirectAttributes.addFlashAttribute("action", "lastAdminInvalidEdit");
-            log.info("Last Admin with id - '{}' can't remove ROLE_ADMIN from self", id);
-            return "redirect:" + previousPage;
+        if (id == authUser.getId()) {
+            if (isLastEnabledAdminDisableSelf(userEditDto)) {
+                redirectAttributes.addFlashAttribute("action", "lastAdminDisableSelf");
+                log.info("Last Admin with id - '{}' can't disable self", id);
+                return "redirect:" + previousPage;
+            }
+
+            // if Last Admin remove ROLE_ADMIN from self
+            if (isLastAdminChangeSelfRoleToNonAdmin(userEditDto)) {
+                redirectAttributes.addFlashAttribute("action", "lastAdminInvalidEdit");
+                log.info("Last Admin with id - '{}' can't remove ROLE_ADMIN from self", id);
+                return "redirect:" + previousPage;
+            }
         }
 
         // check validation errors
@@ -117,11 +125,18 @@ public class UserController {
         redirectAttributes.addFlashAttribute("action", "successEdit");
 
         // if authenticated Admin remove ROLE_ADMIN than update authorities in security context
-        if (id == authUser.getId()
-                && !userEditDto.getRoles().contains(new Role("ROLE_ADMIN"))) {
-            log.info("Authenticated Admin with id '{}' remove ROLE_ADMIN from self", id);
-            setAuthoritiesInAuthentication(updatedUser.getRoles());
-            return "redirect:/";
+        if (id == authUser.getId()) {
+            if (!userEditDto.isEnabled()) {
+                log.info("Authenticated Admin with id '{}' disable self", id);
+                logout(request);
+                return "redirect:/login";
+            }
+
+            if (!userEditDto.getRoles().contains(new Role("ROLE_ADMIN"))) {
+                log.info("Authenticated Admin with id '{}' remove ROLE_ADMIN from self", id);
+                setAuthoritiesInAuthentication(updatedUser.getRoles());
+                return "redirect:/";
+            }
         }
 
         return "redirect:" + previousPage;
@@ -129,7 +144,28 @@ public class UserController {
 
     private boolean isLastAdminChangeSelfRoleToNonAdmin(UserEditDto userEditDto) {
         return !userEditDto.getRoles().contains(new Role("ROLE_ADMIN"))
-                && roleService.findByName("ROLE_ADMIN").getUsers().size() == 1;
+//                && isLastAdmin();
+                && isLastEnabledAdmin();
+    }
+
+    private boolean isLastAdmin() {
+        return roleService.findByName("ROLE_ADMIN").getUsers().size() == 1;
+    }
+
+    private boolean isLastEnabledAdmin() {
+        Set<User> users = roleService.findByName("ROLE_ADMIN").getUsers();
+        int countEnabledUsers = 0;
+        for (User u : users) {
+            if (u.isEnabled()) {
+                countEnabledUsers++;
+            }
+        }
+
+        return countEnabledUsers == 1;
+    }
+
+    private boolean isLastEnabledAdminDisableSelf(UserEditDto userEditDto) {
+        return !userEditDto.isEnabled() && isLastEnabledAdmin();
     }
 
     private void rejectEmailIfExists(UserEditDto userEditDto,
