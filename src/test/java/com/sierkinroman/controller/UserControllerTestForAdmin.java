@@ -252,14 +252,14 @@ class UserControllerTestForAdmin {
     }
 
     @Test
-    @WithUserDetails(value = "admin")
+    @WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void testCorrectDisableSelf_NotLastAdmin() throws Exception {
-        User admin = userService.findByUsername("admin");
-        UserEditDto disabledEditDto = getUserEditDto(admin, false);
+        User admin2 = userService.findByUsername("admin2");
+        UserEditDto disabledEditDto = getUserEditDto(admin2, false);
 
-        this.mockMvc.perform(get("/admin/{id}/edit", admin.getId()).header("Referer", getRefererUrl()));
+        this.mockMvc.perform(get("/admin/{id}/edit", admin2.getId()).header("Referer", getRefererUrl()));
 
-        this.mockMvc.perform(post("/admin/{id}/edit", admin.getId()).flashAttr("userEditDto", disabledEditDto).with(csrf()))
+        this.mockMvc.perform(post("/admin/{id}/edit", admin2.getId()).flashAttr("userEditDto", disabledEditDto).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(unauthenticated())
                 .andExpect(redirectedUrl("/login"));
