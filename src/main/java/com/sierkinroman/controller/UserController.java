@@ -229,7 +229,7 @@ public class UserController {
                                       RedirectAttributes redirectAttributes) {
         // if Last Admin delete self
         if (authUser.getId() == id) {
-            if (roleService.findByName("ROLE_ADMIN").getUsers().size() == 1) {
+            if (isLastEnabledAdmin()) {
                 redirectAttributes.addFlashAttribute("action", "lastAdminInvalidDelete");
                 log.info("Last Admin with id '{}' can't delete self", id);
                 setPreviousPage(request);
