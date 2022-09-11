@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
-class UserControllerTestForAdmin {
+class UserControllerForAdminTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -79,22 +80,35 @@ class UserControllerTestForAdmin {
                 .andExpect(authenticated().withRoles("ADMIN"))
                 .andExpect(redirectedUrl("/admin/" + id + "/edit"));
 
-        this.mockMvc.perform(get("/admin/{id}/edit", 1))
+        this.mockMvc.perform(get("/admin/{id}/edit", id))
                 .andExpect(status().isOk())
                 .andExpect(authenticated().withRoles("ADMIN"))
                 .andExpect(xpath("//input[@id='username' and @value='admin']").exists())
+                .andExpect(xpath("//div[@id='enabled_wrapper']").exists())
                 .andExpect(xpath("//div[@id='roles_wrapper']").exists());
     }
 
     @Test
     @WithUserDetails(value = "admin")
-    public void testIncorrectDeleteSelf_LastAdmin() throws Exception {
-        tearDown();
+    public void testIncorrectDeleteSelf_LastEnabledAdmin() throws Exception {
+        disableUser("admin2");
 
         this.mockMvc.perform(post("/admin/{id}/delete", 1).header("Referer", getRefererUrl()).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated().withRoles("ADMIN"))
                 .andExpect(redirectedUrl(getRefererUrl()));
+
+        assertThat(userService.findByUsername("admin")).isNotNull();
+    }
+
+    private void disableUser(String username) {
+        User user = userService.findByUsername(username);
+        if (user != null) {
+            user.setEnabled(false);
+            userService.save(user);
+        } else {
+            fail("User with username '" + username + "' is not present in database");
+        }
     }
 
     private String getRefererUrl() {
@@ -103,33 +117,36 @@ class UserControllerTestForAdmin {
 
     @Test
     @WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    public void testCorrectDeleteSelf_NotLastAdmin() throws Exception {
+    public void testCorrectDeleteSelf() throws Exception {
         long userId = userService.findByUsername("admin2").getId();
 
         this.mockMvc.perform(post("/admin/{id}/delete", userId).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(unauthenticated())
                 .andExpect(redirectedUrl("/login"));
+
+        assertThat(userService.findByUsername("admin2")).isNull();
     }
 
     @Test
     @WithUserDetails(value = "admin")
-    public void testCorrectDelete_NotLastAdmin() throws Exception {
+    public void testCorrectDelete() throws Exception {
         long userId = userService.findByUsername("admin2").getId();
 
         this.mockMvc.perform(post("/admin/{id}/delete", userId).header("Referer", getRefererUrl()).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated().withRoles("ADMIN"))
                 .andExpect(redirectedUrl(getRefererUrl()));
+
+        assertThat(userService.findByUsername("admin2")).isNull();
     }
 
     @Test
     @WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     public void testCorrectUpdateSelf() throws Exception {
         User admin2 = userService.findByUsername("admin2");
-
         UserEditDto userEditDto = new UserEditDto(admin2);
-        userEditDto.setEmail("admin2.new@gmail.com");
+        userEditDto.setEmail("admin2new@gmail.com");
         userEditDto.setFirstName("Admin2NewName");
         userEditDto.setLastName("Admin2NewLastName");
 
@@ -139,12 +156,18 @@ class UserControllerTestForAdmin {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated().withRoles("ADMIN"))
                 .andExpect(redirectedUrl(getRefererUrl()));
+
+        User updatedAdmin = userService.findByUsername("admin2");
+        assertThat(updatedAdmin).isNotNull();
+        assertThat(updatedAdmin.getEmail()).isEqualTo("admin2new@gmail.com");
+        assertThat(updatedAdmin.getFirstName()).isEqualTo("Admin2NewName");
+        assertThat(updatedAdmin.getLastName()).isEqualTo("Admin2NewLastName");
     }
 
     @Test
     @WithUserDetails(value = "admin")
-    public void testIncorrectUpdateSelf_RemoveRoleAdmin_FromLastAdmin() throws Exception {
-        tearDown();
+    public void testIncorrectUpdateSelf_RemoveRoleAdmin_FromLastEnabledAdmin() throws Exception {
+        disableUser("admin2");
         User admin = userService.findByUsername("admin");
 
         this.mockMvc.perform(get("/admin/{id}/edit", admin.getId()).header("Referer", getRefererUrl()));
@@ -154,19 +177,23 @@ class UserControllerTestForAdmin {
                 .andExpect(authenticated().withRoles("ADMIN"))
                 .andExpect(redirectedUrl(getRefererUrl()));
 
+        User notUpdatedUser = userService.findByUsername("admin");
+        assertThat(notUpdatedUser).isNotNull();
+        assertThat(notUpdatedUser.getRoles()).contains(new Role("ROLE_ADMIN"));
     }
 
     private UserEditDto getNotAdminEditDto(User user) {
-        UserEditDto userEditDto = new UserEditDto(user);
         HashSet<Role> roles = new HashSet<>();
         roles.add(roleService.findByName("ROLE_USER"));
+
+        UserEditDto userEditDto = new UserEditDto(user);
         userEditDto.setRoles(roles);
         return userEditDto;
     }
 
     @Test
     @WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    public void testCorrectUpdateSelf_RemoveRoleAdmin_FromNotLastAdmin() throws Exception {
+    public void testCorrectUpdateSelf_RemoveRoleAdmin() throws Exception {
         User admin2 = userService.findByUsername("admin2");
 
         this.mockMvc.perform(get("/admin/{id}/edit", admin2.getId()).header("Referer", getRefererUrl()));
@@ -175,6 +202,10 @@ class UserControllerTestForAdmin {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated().withRoles("USER"))
                 .andExpect(redirectedUrl("/"));
+
+        User updatedUser = userService.findByUsername("admin2");
+        assertThat(updatedUser).isNotNull();
+        assertThat(updatedUser.getRoles()).doesNotContain(new Role("ROLE_ADMIN"));
 
         this.mockMvc.perform(get("/user/edit"))
                 .andExpect(status().isOk())
@@ -197,7 +228,7 @@ class UserControllerTestForAdmin {
 
     @Test
     @WithUserDetails(value = "admin")
-    public void testCorrectUpdate_DisableUser() throws Exception {
+    public void testCorrectDisable() throws Exception {
         User admin2 = userService.findByUsername("admin2");
         UserEditDto disabledEditDto = getUserEditDto(admin2, false);
 
@@ -219,7 +250,7 @@ class UserControllerTestForAdmin {
 
     @Test
     @WithUserDetails(value = "admin")
-    public void testCorrectUpdate_EnableUser() throws Exception {
+    public void testCorrectEnable() throws Exception {
         User user2 = userService.findByUsername("user2");
         assertThat(user2.isEnabled()).isFalse();
         UserEditDto enabledEditDto = getUserEditDto(user2, true);
@@ -236,8 +267,8 @@ class UserControllerTestForAdmin {
 
     @Test
     @WithUserDetails(value = "admin")
-    public void testIncorrectDisableSelf_LastAdmin() throws Exception {
-        tearDown();
+    public void testIncorrectDisableSelf_LastEnabledAdmin() throws Exception {
+        disableUser("admin2");
         User admin = userService.findByUsername("admin");
         UserEditDto disabledEditDto = getUserEditDto(admin, false);
 
@@ -253,7 +284,7 @@ class UserControllerTestForAdmin {
 
     @Test
     @WithUserDetails(value = "admin2", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    public void testCorrectDisableSelf_NotLastAdmin() throws Exception {
+    public void testCorrectDisableSelf() throws Exception {
         User admin2 = userService.findByUsername("admin2");
         UserEditDto disabledEditDto = getUserEditDto(admin2, false);
 
@@ -263,6 +294,10 @@ class UserControllerTestForAdmin {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(unauthenticated())
                 .andExpect(redirectedUrl("/login"));
+
+        User updatedUser = userService.findByUsername("admin2");
+        assertThat(updatedUser).isNotNull();
+        assertThat(updatedUser.isEnabled()).isFalse();
     }
 
 }

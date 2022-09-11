@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @WithUserDetails(value = "admin")
-class SignupControllerTestForAdmin {
+class SignupControllerForAdminTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,6 +46,7 @@ class SignupControllerTestForAdmin {
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
                 .andExpect(xpath("/html/body/div/form/p[1]").string("Add User"))
+                .andExpect(xpath("//div[@id='enabled_wrapper']").exists())
                 .andExpect(xpath("//div[@id='roles_wrapper']").exists());
     }
 
@@ -79,32 +80,6 @@ class SignupControllerTestForAdmin {
         return "http://localhost:8080/admin/users/1?sortField=username&sortAsc=true";
     }
 
-//    @Test
-//    public void testCorrectAddDisabledUser() throws Exception {
-//        UserSignupDto userSignupDto = new UserSignupDto("admin100",
-//                "123456",
-//                "123456",
-//                "admin100@gmail.com",
-//                "Admin100",
-//                "AdminLN100",
-//                false,
-//                Collections.singleton(roleService.findByName("ROLE_ADMIN")));
-//
-//        this.mockMvc.perform(get("/admin/addUser").header("Referer", getRefererUrl()));
-//
-//        this.mockMvc.perform(post("/admin/addUser").flashAttr("userSignupDto", userSignupDto).with(csrf()))
-//                .andExpect(status().is3xxRedirection())
-//                .andExpect(authenticated())
-//                .andExpect(redirectedUrl(getRefererUrl()));
-//
-//        User addedUser = userService.findByUsername("admin100");
-//        assertThat(addedUser).isNotNull();
-//        assertThat(addedUser.isEnabled()).isFalse();
-//        assertThat(addedUser.getRoles()).contains(new Role("ROLE_ADMIN"));
-//
-//        userService.deleteById(addedUser.getId());
-//    }
-
     @Test
     public void testInvalidAddUser() throws Exception {
         User persistedUser = userService.findByUsername("user1");
@@ -124,8 +99,8 @@ class SignupControllerTestForAdmin {
                 .andExpect(xpath("/html/body/div/form/p[3]").string("*Username is used"))
                 .andExpect(xpath("/html/body/div/form/p[6]").string("*Confirm password is wrong"))
                 .andExpect(xpath("/html/body/div/form/p[8]").string("*E-mail is used"))
-                .andExpect(xpath("//div[@id='roles_wrapper']/p[2]").string("*Role can't be empty"))
-                .andExpect(xpath("//div[@id='roles_wrapper']").exists());
+                .andExpect(xpath("//div[@id='roles_wrapper']").exists())
+                .andExpect(xpath("//div[@id='roles_wrapper']/p[2]").string("*Role can't be empty"));
     }
 
 }

@@ -23,7 +23,7 @@ public class LoginTest {
     private MockMvc mockMvc;
 
     @Test
-    public void accessDeniedTest() throws Exception {
+    public void testAccessDenied() throws Exception {
         this.mockMvc.perform(get("/"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(unauthenticated())
@@ -31,7 +31,7 @@ public class LoginTest {
     }
 
     @Test
-    public void correctLoginTest() throws Exception {
+    public void testCorrectLogin() throws Exception {
         this.mockMvc.perform(formLogin().user("admin").password("admin"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(authenticated().withUsername("admin").withRoles("ADMIN"))
@@ -39,7 +39,7 @@ public class LoginTest {
     }
 
     @Test
-    public void incorrectLoginTest() throws Exception {
+    public void testIncorrectLogin() throws Exception {
         this.mockMvc.perform(formLogin().user("admin12345").password("admin"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(unauthenticated())
@@ -47,7 +47,7 @@ public class LoginTest {
     }
 
     @Test
-    public void incorrectPasswordTest() throws Exception {
+    public void testIncorrectPassword() throws Exception {
         this.mockMvc.perform(formLogin().user("admin").password("admin123"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(unauthenticated())
@@ -55,7 +55,7 @@ public class LoginTest {
     }
 
     @Test
-    public void emptyCredentialsTest() throws Exception {
+    public void testEmptyCredentials() throws Exception {
         this.mockMvc.perform(formLogin().user("").password(""))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(unauthenticated())
@@ -63,7 +63,7 @@ public class LoginTest {
     }
 
     @Test
-    public void loginBlockedUserTest() throws Exception {
+    public void testLoginBlockedUser() throws Exception {
         this.mockMvc.perform(formLogin().user("user1").password("user1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(unauthenticated())

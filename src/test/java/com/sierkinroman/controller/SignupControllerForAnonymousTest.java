@@ -5,6 +5,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
@@ -24,7 +25,7 @@ import com.sierkinroman.service.UserService;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
-class SignupControllerTestForAnonymous {
+class SignupControllerForAnonymousTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,8 +39,8 @@ class SignupControllerTestForAnonymous {
                 .andExpect(status().isOk())
                 .andExpect(unauthenticated())
                 .andExpect(xpath("/html/body/div/form/p[1]").string("Sign up"))
-                .andExpect(xpath("//div[@id='roles_wrapper']").doesNotExist())
-        ;
+                .andExpect(xpath("//div[@id='enabled_wrapper']").doesNotExist())
+                .andExpect(xpath("//div[@id='roles_wrapper']").doesNotExist());
     }
 
     @Test
@@ -55,7 +56,7 @@ class SignupControllerTestForAnonymous {
         this.mockMvc.perform(post("/signup").flashAttr("userSignupDto", userSignupDto).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(unauthenticated())
-                .andExpect(view().name("redirect:/login"));
+                .andExpect(redirectedUrl("/login"));
 
         User registeredUser = userService.findByUsername("user100");
 
