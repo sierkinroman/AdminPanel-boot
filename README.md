@@ -8,8 +8,9 @@ The application has two roles: **Admin** and **User**.
 On starting application, the database is initialized with default accounts.
 
 ### Some features
-- Last Admin can't delete himself
-- Last Admin can't change self role to non Admin
+- Last enabled Admin can't delete himself
+- Last enabled Admin can't change self role to non Admin
+- Last enabled Admin can't disable self
 - After an authorized user deletes himself, he is automatically logged out
 - If Admin changes self role to non Admin, he doesn't have access to adminPanel
 
@@ -29,7 +30,7 @@ To log in as *Admin*:<br/>
 username and password: **admin**
 
 To log in as *default User*:<br/>
-username and password: **user1** or (user1-user49)
+username and password: **user1** or (**user10-user49**, user1-user9 is blocked)
 
 Or to log in your *own account* type your credentials.
 
