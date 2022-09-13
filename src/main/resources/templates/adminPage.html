@@ -52,10 +52,11 @@
             <div class="check_roles_wrapper">
                 <span>Roles:</span>
                 <select onChange="window.location.href=this.value">
-                    <option th:each="role : ${roles}"
-                            th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
-                            th:value="${urlBuilder.replaceQueryParam('checkedRole', role).toUriString()}" th:text="${role}" th:selected="${checkedRole == role} ? 'selected'">
-                    </option>
+                        <option th:each="role : ${roles}"
+                                th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
+                                th:value="${urlBuilder.replacePath('/admin/users/1').replaceQueryParam('checkedRole', role).toUriString()}"
+                                th:text="${role}" th:selected="${checkedRole == role} ? 'selected'">
+                        </option>
                 </select>
             </div>
         </th>
@@ -83,23 +84,23 @@
 </table>
 
 <div class="pagination">
-    <a th:if="${currentPage > 1}" th:href="@{/admin/users/1(sortField=${sortField}, sortAsc=${sortAsc})}"
+    <a th:if="${currentPage > 1}" th:href="@{/admin/users/1(sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole})}"
        class="page_link">&lt;&lt;</a>
     <a th:if="${currentPage > 1}"
-       th:href="@{/admin/users/{previousPage}(previousPage=${currentPage} - 1, sortField=${sortField}, sortAsc=${sortAsc})}"
+       th:href="@{/admin/users/{previousPage}(previousPage=${currentPage} - 1, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole})}"
        class="page_link">&lt;</a>
 
     <th:block th:each="i: ${#numbers.sequence(1, totalPages)}">
-        <a th:if="${currentPage != i}" th:href="@{/admin/users/{i}(i=${i}, sortField=${sortField}, sortAsc=${sortAsc})}"
+        <a th:if="${currentPage != i}" th:href="@{/admin/users/{i}(i=${i}, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole})}"
            th:text="${i}" class="page_link"></a>
         <span th:if="${currentPage == i}" th:text="${i}" class="page_link current_page"></span>
     </th:block>
 
     <a th:if="${currentPage < totalPages}"
-       th:href="@{/admin/users/{nextPage}(nextPage=${currentPage} + 1, sortField=${sortField}, sortAsc=${sortAsc})}"
+       th:href="@{/admin/users/{nextPage}(nextPage=${currentPage} + 1, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole})}"
        class="page_link">&gt;</a>
     <a th:if="${currentPage < totalPages}"
-       th:href="@{/admin/users/{lastPage}(lastPage=${totalPages}, sortField=${sortField}, sortAsc=${sortAsc})}"
+       th:href="@{/admin/users/{lastPage}(lastPage=${totalPages}, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole})}"
        class="page_link">&gt;&gt;</a>
 
 </div>
