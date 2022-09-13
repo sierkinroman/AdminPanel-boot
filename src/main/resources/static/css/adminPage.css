@@ -129,6 +129,23 @@ body {
     content: "\25BC";
 }
 
+.check_roles_wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.check_roles_wrapper select {
+    margin: 0 0 0 5px;
+    cursor: pointer;
+    outline: none;
+    background-color: #dfe0c0;;
+    border-radius: 8px;
+}
+
+.check_roles_wrapper select:hover {
+    background-color: #d2d4b6;
+}
+
 .cell {
     padding: 5px 10px;
     border-right: 2px solid rgb(56, 56, 56);

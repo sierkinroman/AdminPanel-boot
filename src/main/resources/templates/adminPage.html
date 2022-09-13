@@ -28,20 +28,29 @@
 <table class="table">
     <tr>
         <th class="table_header"><a
-                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='username', sortAsc=(${sortField} != 'username' ? 'true' : (${sortAsc} ? 'false' : 'true')))}"
+                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='username', sortAsc=(${sortField} != 'username' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
                 data-name="username">Username</a></th>
         <th class="table_header"><a
-                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='email', sortAsc=(${sortField} != 'email' ? 'true' : (${sortAsc} ? 'false' : 'true')))}"
+                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='email', sortAsc=(${sortField} != 'email' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
                 data-name="email">Email</a></th>
         <th class="table_header"><a
-                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='firstName', sortAsc=(${sortField} != 'firstName' ? 'true' : (${sortAsc} ? 'false' : 'true')))}"
+                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='firstName', sortAsc=(${sortField} != 'firstName' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
                 data-name="firstName">First name</a></th>
         <th class="table_header"><a
-                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='lastName', sortAsc=(${sortField} != 'lastName' ? 'true' : (${sortAsc} ? 'false' : 'true')))}"
+                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='lastName', sortAsc=(${sortField} != 'lastName' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
                 data-name="lastName">Last name</a></th>
-        <th class="table_header"><a
-                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='roles', sortAsc=(${sortField} != 'roles' ? 'true' : (${sortAsc} ? 'false' : 'true')))}"
-                data-name="roles">Roles</a></th>
+        <th class="table_header">
+            <div class="check_roles_wrapper">
+                <span>Roles:</span>
+                <select onChange="window.location.href=this.value">
+                    <th:block th:each="role : ${roles}">
+                        <option th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
+                                th:value="${urlBuilder.replaceQueryParam('checkedRole', role).toUriString()}" th:text="${role}" th:selected="${checkedRole == role} ? 'selected'">
+                        </option>
+                    </th:block>
+                </select>
+            </div>
+        </th>
         <th class="table_header">Enabled</th>
         <th class="table_header">Actions</th>
     </tr>
