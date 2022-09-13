@@ -3,6 +3,7 @@ package com.sierkinroman.service.impl;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.sierkinroman.entities.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,8 +51,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> findAll(Pageable pageable) {
         log.debug("Find all Users with pageable {}", pageable);
-        // TODO bug when sorting roles
-        return userRepo.findAllDistinctBy(pageable);
+        return userRepo.findAll(pageable);
+    }
+
+    @Override
+    public Page<User> findAllWithRoles(Set<Role> roles, Pageable pageable) {
+        return userRepo.findAllByRolesIn(roles, pageable);
     }
 
     @Override

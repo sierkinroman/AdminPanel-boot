@@ -2,6 +2,7 @@ package com.sierkinroman.service;
 
 import java.util.Set;
 
+import com.sierkinroman.entities.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -18,6 +19,8 @@ public interface UserService {
     Set<User> findAll();
 
     Page<User> findAll(Pageable pageable);
+
+    Page<User> findAllWithRoles(Set<Role> roles, Pageable pageable);
 
     User save(User user);
 

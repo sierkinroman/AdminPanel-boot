@@ -1,10 +1,12 @@
 package com.sierkinroman.entities.repository;
 
+import com.sierkinroman.entities.Role;
+import com.sierkinroman.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.sierkinroman.entities.User;
+import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -12,8 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByEmail(String email);
 
-//	Page<User> findAllDistinctByRolesIn(Set<Role> roles, Pageable pageable);
-
-    Page<User> findAllDistinctBy(Pageable pageable);
+	Page<User> findAllByRolesIn(Set<Role> roles, Pageable pageable);
 
 }
