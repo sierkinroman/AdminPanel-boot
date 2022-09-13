@@ -28,18 +28,26 @@
 
 <table class="table">
     <tr>
-        <th class="table_header"><a
-                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='username', sortAsc=(${sortField} != 'username' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
-                data-name="username">Username</a></th>
-        <th class="table_header"><a
-                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='email', sortAsc=(${sortField} != 'email' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
-                data-name="email">Email</a></th>
-        <th class="table_header"><a
-                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='firstName', sortAsc=(${sortField} != 'firstName' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
-                data-name="firstName">First name</a></th>
-        <th class="table_header"><a
-                th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='lastName', sortAsc=(${sortField} != 'lastName' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
-                data-name="lastName">Last name</a></th>
+        <th class="table_header">
+            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='username', sortAsc=(${sortField} != 'username' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
+                data-name="username">Username</a>
+        </th>
+        <th class="table_header">
+            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='email', sortAsc=(${sortField} != 'email' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
+                data-name="email">Email</a>
+        </th>
+        <th class="table_header">
+            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='firstName', sortAsc=(${sortField} != 'firstName' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
+                data-name="firstName">First name</a>
+        </th>
+        <th class="table_header">
+            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='lastName', sortAsc=(${sortField} != 'lastName' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
+                data-name="lastName">Last name</a>
+        </th>
+        <th class="table_header">
+            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='enabled', sortAsc=(${sortField} != 'enabled' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
+               data-name="enabled">Enabled</a>
+        </th>
         <th class="table_header">
             <div class="check_roles_wrapper">
                 <span>Roles:</span>
@@ -51,7 +59,6 @@
                 </select>
             </div>
         </th>
-        <th class="table_header">Enabled</th>
         <th class="table_header">Actions</th>
     </tr>
     <tr th:each="user : ${users}">
@@ -59,14 +66,14 @@
         <td class="cell" th:text="${user.email}">email</td>
         <td class="cell" th:text="${user.firstName}">firstName</td>
         <td class="cell" th:text="${user.lastName}">lastName</td>
+        <td class="cell" th:switch="${user.enabled}">
+            <span th:case="true" style="color: #088108">Enabled</span>
+            <span th:case="false" style="color: #e91717">Disabled</span>
+        </td>
         <td class="cell roles_cell">
             <th:block th:each="role : ${user.roles}">
                 <span th:text="${role.name}"></span><span>,</span>
             </th:block>
-        </td>
-        <td class="cell" th:switch="${user.enabled}">
-            <span th:case="true" style="color: #088108">Enabled</span>
-            <span th:case="false" style="color: #e91717">Disabled</span>
         </td>
         <td class="cell">
             <a th:href="@{/admin/{id}/edit(id=${user.id})}">Edit</a>
