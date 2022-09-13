@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -15,6 +16,7 @@
     <form th:action="${#authorization.expression('isAuthenticated()')} ? @{/admin/addUser} : @{/signup}" method="POST"
           th:object="${userSignupDto}" class="form">
         <p class="form_title" th:text="${#authorization.expression('isAuthenticated()')} ? 'Add User' : 'Sign up'">Sign up</p>
+
         <p class="text_form">Username:</p>
         <input type="text" name="username" th:field="*{username}" autofocus="autofocus" class="input_form"/>
         <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="invalid_field"></p>

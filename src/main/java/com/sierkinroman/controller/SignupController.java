@@ -1,9 +1,10 @@
 package com.sierkinroman.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.sierkinroman.entities.User;
+import com.sierkinroman.entities.dto.UserSignupDto;
+import com.sierkinroman.service.RoleService;
+import com.sierkinroman.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,27 +13,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.sierkinroman.entities.User;
-import com.sierkinroman.entities.dto.UserSignupDto;
-import com.sierkinroman.service.RoleService;
-import com.sierkinroman.service.UserService;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @Slf4j
 @Controller
 public class SignupController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private String previousPage = "/";
+
+    public SignupController(UserService userService, RoleService roleService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.userService = userService;
+        this.roleService = roleService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     @GetMapping(value = {"/signup", "/admin/addUser"})
     public String showSignup(Model model, HttpServletRequest request) {

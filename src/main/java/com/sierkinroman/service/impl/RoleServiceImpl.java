@@ -1,23 +1,23 @@
 package com.sierkinroman.service.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.sierkinroman.entities.Role;
 import com.sierkinroman.entities.repository.RoleRepository;
 import com.sierkinroman.service.RoleService;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @Service
 public class RoleServiceImpl implements RoleService {
 
-    @Autowired
-    private RoleRepository roleRepo;
+    private final RoleRepository roleRepo;
+
+    public RoleServiceImpl(RoleRepository roleRepo) {
+        this.roleRepo = roleRepo;
+    }
 
     @Override
     public Role findById(long id) {
@@ -28,16 +28,13 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role findByName(String name) {
         log.debug("Find Role by name '{}'", name);
-        Role role = roleRepo.findByName(name);
-        return role;
+        return roleRepo.findByName(name);
     }
 
     @Override
     public Set<Role> findAll() {
         log.debug("Find all Roles");
-        Set<Role> roles = new HashSet<>();
-        roleRepo.findAll().forEach(roles::add);
-        return roles;
+        return new HashSet<>(roleRepo.findAll());
     }
 
     @Override

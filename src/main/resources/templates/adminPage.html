@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -43,11 +44,10 @@
             <div class="check_roles_wrapper">
                 <span>Roles:</span>
                 <select onChange="window.location.href=this.value">
-                    <th:block th:each="role : ${roles}">
-                        <option th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
-                                th:value="${urlBuilder.replaceQueryParam('checkedRole', role).toUriString()}" th:text="${role}" th:selected="${checkedRole == role} ? 'selected'">
-                        </option>
-                    </th:block>
+                    <option th:each="role : ${roles}"
+                            th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
+                            th:value="${urlBuilder.replaceQueryParam('checkedRole', role).toUriString()}" th:text="${role}" th:selected="${checkedRole == role} ? 'selected'">
+                    </option>
                 </select>
             </div>
         </th>
@@ -122,15 +122,15 @@
 <script th:src="@{/js/toastr/toastrConfig.js}"></script>
 <script th:inline="javascript">
     $(document).ready(function () {
-        var action = /*[[${action}]]*/ '';
+        let action = /*[[${action}]]*/ '';
         if (action === 'successEdit') {
             toastr["success"]("User was updated successfully");
         } else if (action === 'successDelete') {
             toastr["success"]("User was deleted successfully");
-        } else if (action === 'lastAdminInvalidEdit') {
+        } else if (action === 'lastAdminRemoveRoleAdmin') {
             toastr["warning"]("Last enabled Admin can't change self role to non Admin", "Edit isn't possible");
         } else if (action === 'lastAdminInvalidDelete') {
-            toastr["warning"]("Last Admin can't delete himself", "Delete isn't possible");
+            toastr["warning"]("Last enabled Admin can't delete himself", "Delete isn't possible");
         } else if (action === 'lastAdminDisableSelf') {
             toastr["warning"]("Last enabled Admin can't disable himself", "Disable isn't possible");
         }

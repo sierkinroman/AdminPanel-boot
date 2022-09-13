@@ -1,14 +1,12 @@
 package com.sierkinroman.controller;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.sierkinroman.entities.Role;
+import com.sierkinroman.entities.User;
+import com.sierkinroman.entities.dto.UserEditDto;
+import com.sierkinroman.service.RoleService;
+import com.sierkinroman.service.UserService;
+import com.sierkinroman.service.impl.userdetails.UserDetailsImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,34 +22,32 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.sierkinroman.entities.User;
-import com.sierkinroman.entities.Role;
-import com.sierkinroman.entities.dto.UserEditDto;
-import com.sierkinroman.service.RoleService;
-import com.sierkinroman.service.UserService;
-import com.sierkinroman.service.impl.userdetails.UserDetailsImpl;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @Controller
 public class UserController {
 
     // TODO change color and transparent in toastr
-    // TODO refactor
-    // TODO last enabled admin cant disabel change role self
-    @Autowired
-    private UserService userService;
 
-    @Autowired
-    private RoleService roleService;
+    private final UserService userService;
+
+    private final RoleService roleService;
 
     private String previousPage = "/";
 
+    public UserController(UserService userService, RoleService roleService) {
+        this.userService = userService;
+        this.roleService = roleService;
+    }
+
     @GetMapping(value = "/admin/{id}/edit")
-    public String showEditPageToSpecifiedUser(@PathVariable long id,
-                                              Model model,
-                                              HttpServletRequest request) {
+    public String showEditPageForSpecifiedUser(@PathVariable long id, Model model, HttpServletRequest request) {
         model.addAttribute("userEditDto", new UserEditDto(userService.findById(id)));
         model.addAttribute("listRoles", roleService.findAll());
         setPreviousPage(request);
@@ -66,8 +62,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/user/edit")
-    public String showEditPage(@AuthenticationPrincipal UserDetailsImpl authUser,
-                               Model model) {
+    public String showEditPage(@AuthenticationPrincipal UserDetailsImpl authUser, Model model) {
         if (authUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
             return "redirect:/admin/" + authUser.getId() + "/edit";
         }
@@ -92,9 +87,8 @@ public class UserController {
                 return "redirect:" + previousPage;
             }
 
-            // if Last Admin remove ROLE_ADMIN from self
-            if (isLastAdminChangeSelfRoleToNonAdmin(userEditDto)) {
-                redirectAttributes.addFlashAttribute("action", "lastAdminInvalidEdit");
+            if (isLastEnabledAdminChangeSelfRoleToNonAdmin(userEditDto)) {
+                redirectAttributes.addFlashAttribute("action", "lastAdminRemoveRoleAdmin");
                 log.info("Last Admin with id - '{}' can't remove ROLE_ADMIN from self", id);
                 return "redirect:" + previousPage;
             }
@@ -122,41 +116,37 @@ public class UserController {
         userService.update(updatedUser);
         log.info("Updated user with id '{}'", id);
 
-        redirectAttributes.addFlashAttribute("action", "successEdit");
 
-        // if authenticated Admin remove ROLE_ADMIN than update authorities in security context
         if (id == authUser.getId()) {
+            // if authenticated Admin disable self than logout
             if (!userEditDto.isEnabled()) {
                 log.info("Authenticated Admin with id '{}' disable self", id);
                 logout(request);
                 return "redirect:/login";
             }
 
-            if (!userEditDto.getRoles().contains(new Role("ROLE_ADMIN"))) {
+            // if authenticated Admin remove ROLE_ADMIN than update authorities in security context
+            if (isAdminChangeSelfRoleToNonAdmin(userEditDto)) {
                 log.info("Authenticated Admin with id '{}' remove ROLE_ADMIN from self", id);
                 setAuthoritiesInAuthentication(updatedUser.getRoles());
                 return "redirect:/";
             }
         }
 
+        redirectAttributes.addFlashAttribute("action", "successEdit");
         return "redirect:" + previousPage;
     }
 
-    private boolean isLastAdminChangeSelfRoleToNonAdmin(UserEditDto userEditDto) {
-        return !userEditDto.getRoles().contains(new Role("ROLE_ADMIN"))
-//                && isLastAdmin();
-                && isLastEnabledAdmin();
-    }
-
-    private boolean isLastAdmin() {
-        return roleService.findByName("ROLE_ADMIN").getUsers().size() == 1;
+    private boolean isLastEnabledAdminDisableSelf(UserEditDto userEditDto) {
+        return !userEditDto.isEnabled() && isLastEnabledAdmin();
     }
 
     private boolean isLastEnabledAdmin() {
         Set<User> users = roleService.findByName("ROLE_ADMIN").getUsers();
+
         int countEnabledUsers = 0;
-        for (User u : users) {
-            if (u.isEnabled()) {
+        for (User user : users) {
+            if (user.isEnabled()) {
                 countEnabledUsers++;
             }
         }
@@ -164,13 +154,16 @@ public class UserController {
         return countEnabledUsers == 1;
     }
 
-    private boolean isLastEnabledAdminDisableSelf(UserEditDto userEditDto) {
-        return !userEditDto.isEnabled() && isLastEnabledAdmin();
+    private boolean isLastEnabledAdminChangeSelfRoleToNonAdmin(UserEditDto userEditDto) {
+        return isAdminChangeSelfRoleToNonAdmin(userEditDto)
+                && isLastEnabledAdmin();
     }
 
-    private void rejectEmailIfExists(UserEditDto userEditDto,
-                                     long updatedUserId,
-                                     BindingResult bindingResult) {
+    private boolean isAdminChangeSelfRoleToNonAdmin(UserEditDto userEditDto) {
+        return !userEditDto.getRoles().contains(new Role("ROLE_ADMIN"));
+    }
+
+    private void rejectEmailIfExists(UserEditDto userEditDto, long updatedUserId, BindingResult bindingResult) {
         User userByEmail = userService.findByEmail(userEditDto.getEmail());
         if (userByEmail != null
                 && userByEmail.getId() != updatedUserId) {
@@ -181,10 +174,9 @@ public class UserController {
 
     private void setAuthoritiesInAuthentication(Set<Role> roles) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         Collection<GrantedAuthority> updatedAuthorities = new HashSet<>();
-        for (Role role : roles) {
-            updatedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
-        }
+        roles.forEach(role -> updatedAuthorities.add(new SimpleGrantedAuthority(role.getName())));
 
         User authUser = userService.findByUsername(auth.getName());
         authUser.setRoles(roles);
@@ -261,9 +253,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/user/delete")
-    public String deleteUser(@AuthenticationPrincipal UserDetailsImpl authUser,
-                             HttpServletRequest request,
-                             RedirectAttributes redirectAttributes) {
+    public String deleteUser(@AuthenticationPrincipal UserDetailsImpl authUser, HttpServletRequest request) {
         userService.deleteById(authUser.getId());
         log.info("Deleted user with id '{}'", authUser.getId());
         logout(request);

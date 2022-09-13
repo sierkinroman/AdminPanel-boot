@@ -21,7 +21,6 @@ for (let i = 0; i < deleteBtn.length; i++) {
         } else {
             deleteForm.action = `/user/delete`;
         }
-
     });
 }
 

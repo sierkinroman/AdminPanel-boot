@@ -35,13 +35,6 @@ public class UserEditDto {
 
     private Set<Role> roles;
 
-    public UserEditDto(String username, String email, String firstName, String lastName) {
-        this.username = username;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
     public UserEditDto(User user) {
         this.username = user.getUsername();
         this.email = user.getEmail();

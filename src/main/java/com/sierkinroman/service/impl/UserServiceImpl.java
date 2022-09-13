@@ -1,26 +1,26 @@
 package com.sierkinroman.service.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.sierkinroman.entities.Role;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.sierkinroman.entities.User;
+import com.sierkinroman.entities.repository.UserRepository;
+import com.sierkinroman.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.sierkinroman.entities.User;
-import com.sierkinroman.entities.repository.UserRepository;
-import com.sierkinroman.service.UserService;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepo;
+    private final UserRepository userRepo;
+
+    public UserServiceImpl(UserRepository userRepo) {
+        this.userRepo = userRepo;
+    }
 
     @Override
     public User findById(long id) {
@@ -43,9 +43,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Set<User> findAll() {
         log.debug("Find all Users");
-        Set<User> users = new HashSet<>();
-        userRepo.findAll().forEach(users::add);
-        return users;
+        return new HashSet<>(userRepo.findAll());
     }
 
     @Override

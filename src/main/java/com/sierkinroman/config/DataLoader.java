@@ -1,33 +1,33 @@
 package com.sierkinroman.config;
 
-import java.util.Collections;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.sierkinroman.entities.Role;
+import com.sierkinroman.entities.User;
+import com.sierkinroman.service.RoleService;
+import com.sierkinroman.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.sierkinroman.entities.Role;
-import com.sierkinroman.entities.User;
-import com.sierkinroman.service.RoleService;
-import com.sierkinroman.service.UserService;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collections;
+import java.util.Set;
 
 @Slf4j
 @Component
 public class DataLoader {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    public DataLoader(UserService userService, RoleService roleService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.userService = userService;
+        this.roleService = roleService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     @EventListener(ApplicationReadyEvent.class)
     public void runAfterStartup() {
@@ -46,23 +46,13 @@ public class DataLoader {
         Set<Role> roleUser = Collections.singleton(roleService.findByName("ROLE_USER"));
         int countUser = 49;
         for (int i = 1; i <= countUser; i++) {
-            if (i < 10) {
-                createUserIfNotExists("user" + i,
-                        "user" + i,
-                        "user" + i + "@gmail.com",
-                        "User" + i,
-                        "UserLN" + i,
-                        false,
-                        roleUser);
-            } else {
-                createUserIfNotExists("user" + i,
-                        "user" + i,
-                        "user" + i + "@gmail.com",
-                        "User" + i,
-                        "UserLN" + i,
-                        true,
-                        roleUser);
-            }
+            createUserIfNotExists("user" + i,
+                    "user" + i,
+                    "user" + i + "@gmail.com",
+                    "User" + i,
+                    "UserLN" + i,
+                    i >= 10,
+                    roleUser);
         }
         log.info("Initial data has loaded in database");
     }

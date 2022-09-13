@@ -1,8 +1,11 @@
 package com.sierkinroman.controller;
 
 import com.sierkinroman.entities.Role;
+import com.sierkinroman.entities.User;
 import com.sierkinroman.service.RoleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.sierkinroman.service.UserService;
+import com.sierkinroman.service.impl.userdetails.UserDetailsImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,12 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.sierkinroman.entities.User;
-import com.sierkinroman.service.UserService;
-import com.sierkinroman.service.impl.userdetails.UserDetailsImpl;
-
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,13 +26,16 @@ import java.util.Set;
 @Controller
 public class IndexController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
     private int pageSize = 10;
+
+    public IndexController(UserService userService, RoleService roleService) {
+        this.userService = userService;
+        this.roleService = roleService;
+    }
 
     @GetMapping("/login")
     public String showLoginPage() {
@@ -45,8 +45,7 @@ public class IndexController {
 
     @GetMapping("/")
     public String showUserPage(@AuthenticationPrincipal UserDetailsImpl authUser, Model model) {
-        User loginedUser = userService.findByUsername(authUser.getUsername());
-        model.addAttribute("loginedUser", loginedUser);
+        model.addAttribute("loginedUser", userService.findByUsername(authUser.getUsername()));
         log.info("Show homepage for user with id '{}'", authUser.getId());
         return "userPage";
     }
@@ -58,8 +57,7 @@ public class IndexController {
                                 @RequestParam(defaultValue = "true") String sortAsc,
                                 @RequestParam(defaultValue = "All") String checkedRole,
                                 Model model) {
-        User loginedUser = userService.findByUsername(authUser.getUsername());
-        model.addAttribute("loginedUser", loginedUser);
+        model.addAttribute("loginedUser", userService.findByUsername(authUser.getUsername()));
 
         List<String> roles = new ArrayList<>();
         roles.add("All");
