@@ -24,15 +24,17 @@
 
 <h2 class="table_title">All users:</h2>
 
-<form th:action="@{/admin/users/1}" method="GET">
-    <input type="hidden" name="sortField" th:value="${sortField}"/>
-    <input type="hidden" name="sortAsc" th:value="${sortAsc}"/>
-    <input type="hidden" name="checkedRole" th:value="${checkedRole}"/>
+<div class="search_wrapper">
+    <form th:action="@{/admin/users/1}" method="GET">
+        <input type="hidden" name="sortField" th:value="${sortField}"/>
+        <input type="hidden" name="sortAsc" th:value="${sortAsc}"/>
+        <input type="hidden" name="checkedRole" th:value="${checkedRole}"/>
 
-    <input type="text" name="keyword" th:value="${keyword}" required="required"/>
-    <input type="submit" value="Search"/>
-</form>
-<a th:href="@{/admin/users/1(sortField='username', sortAsc='true', checkedRole='All')}">Clear</a>
+        <input type="text" name="keyword" th:value="${keyword}" placeholder="Search user by keyword" required="required"/>
+        <input type="submit" value="Search"/>
+    </form>
+    <a th:href="@{/admin/users/1(sortField='username', sortAsc='true', checkedRole='All')}">Clear</a>
+</div>
 
 <a th:href="@{/admin/addUser}" class="add_user_btn">Add user</a>
 
