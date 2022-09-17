@@ -22,6 +22,10 @@ public interface UserService {
 
     Page<User> findAllWithRoles(Set<Role> roles, Pageable pageable);
 
+    Page<User> searchAll(String keyword, Pageable pageable);
+
+    Page<User> searchAllWithRoles(String keyword, Set<Role> roles, Pageable pageable);
+
     User save(User user);
 
     void update(User user);

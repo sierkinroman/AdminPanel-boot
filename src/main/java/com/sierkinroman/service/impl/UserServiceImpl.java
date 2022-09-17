@@ -48,13 +48,26 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> findAll(Pageable pageable) {
-        log.debug("Find all Users with pageable {}", pageable);
+        log.debug("Find all Users with pageable '{}'", pageable);
         return userRepo.findAll(pageable);
     }
 
     @Override
     public Page<User> findAllWithRoles(Set<Role> roles, Pageable pageable) {
+        log.debug("Find all Users with roles '{}', pageable '{}'", roles, pageable);
         return userRepo.findAllByRolesIn(roles, pageable);
+    }
+
+    @Override
+    public Page<User> searchAll(String keyword, Pageable pageable) {
+        log.debug("Search all Users with keyword '{}', pageable '{}'", keyword, pageable);
+        return userRepo.searchAll(keyword, pageable);
+    }
+
+    @Override
+    public Page<User> searchAllWithRoles(String keyword, Set<Role> roles, Pageable pageable) {
+        log.debug("Search all Users with keyword '{}', roles '{}', pageable '{}'", keyword, roles, pageable);
+        return userRepo.searchAllWithRoles(keyword, roles, pageable);
     }
 
     @Override

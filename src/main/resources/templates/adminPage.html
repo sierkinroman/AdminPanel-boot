@@ -24,28 +24,38 @@
 
 <h2 class="table_title">All users:</h2>
 
+<form th:action="@{/admin/users/1}" method="GET">
+    <input type="hidden" name="sortField" th:value="${sortField}"/>
+    <input type="hidden" name="sortAsc" th:value="${sortAsc}"/>
+    <input type="hidden" name="checkedRole" th:value="${checkedRole}"/>
+
+    <input type="text" name="keyword" th:value="${keyword}" required="required"/>
+    <input type="submit" value="Search"/>
+</form>
+<a th:href="@{/admin/users/1(sortField='username', sortAsc='true', checkedRole='All')}">Clear</a>
+
 <a th:href="@{/admin/addUser}" class="add_user_btn">Add user</a>
 
 <table class="table">
     <tr>
         <th class="table_header">
-            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='username', sortAsc=(${sortField} != 'username' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
+            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='username', sortAsc=(${sortField} != 'username' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole}, keyword=${keyword})}"
                 data-name="username">Username</a>
         </th>
         <th class="table_header">
-            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='email', sortAsc=(${sortField} != 'email' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
+            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='email', sortAsc=(${sortField} != 'email' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole}, keyword=${keyword})}"
                 data-name="email">Email</a>
         </th>
         <th class="table_header">
-            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='firstName', sortAsc=(${sortField} != 'firstName' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
+            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='firstName', sortAsc=(${sortField} != 'firstName' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole}, keyword=${keyword})}"
                 data-name="firstName">First name</a>
         </th>
         <th class="table_header">
-            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='lastName', sortAsc=(${sortField} != 'lastName' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
+            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='lastName', sortAsc=(${sortField} != 'lastName' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole}, keyword=${keyword})}"
                 data-name="lastName">Last name</a>
         </th>
         <th class="table_header">
-            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='enabled', sortAsc=(${sortField} != 'enabled' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole})}"
+            <a th:href="@{/admin/users/{currentPage}(currentPage=${currentPage}, sortField='enabled', sortAsc=(${sortField} != 'enabled' ? 'true' : (${sortAsc} ? 'false' : 'true')), checkedRole=${checkedRole}, keyword=${keyword})}"
                data-name="enabled">Enabled</a>
         </th>
         <th class="table_header">
@@ -84,25 +94,24 @@
 </table>
 
 <div class="pagination">
-    <a th:if="${currentPage > 1}" th:href="@{/admin/users/1(sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole})}"
+    <a th:if="${currentPage > 1}" th:href="@{/admin/users/1(sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole}, keyword=${keyword})}"
        class="page_link">&lt;&lt;</a>
     <a th:if="${currentPage > 1}"
-       th:href="@{/admin/users/{previousPage}(previousPage=${currentPage} - 1, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole})}"
+       th:href="@{/admin/users/{previousPage}(previousPage=${currentPage} - 1, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole}, keyword=${keyword})}"
        class="page_link">&lt;</a>
 
     <th:block th:each="i: ${#numbers.sequence(1, totalPages)}">
-        <a th:if="${currentPage != i}" th:href="@{/admin/users/{i}(i=${i}, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole})}"
+        <a th:if="${currentPage != i}" th:href="@{/admin/users/{i}(i=${i}, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole}, keyword=${keyword})}"
            th:text="${i}" class="page_link"></a>
         <span th:if="${currentPage == i}" th:text="${i}" class="page_link current_page"></span>
     </th:block>
 
     <a th:if="${currentPage < totalPages}"
-       th:href="@{/admin/users/{nextPage}(nextPage=${currentPage} + 1, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole})}"
+       th:href="@{/admin/users/{nextPage}(nextPage=${currentPage} + 1, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole}, keyword=${keyword})}"
        class="page_link">&gt;</a>
     <a th:if="${currentPage < totalPages}"
-       th:href="@{/admin/users/{lastPage}(lastPage=${totalPages}, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole})}"
+       th:href="@{/admin/users/{lastPage}(lastPage=${totalPages}, sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole}, keyword=${keyword})}"
        class="page_link">&gt;&gt;</a>
-
 </div>
 
 <div id="modal">

@@ -50,50 +50,64 @@ public class IndexController {
         return "userPage";
     }
 
-    @GetMapping("/admin/users/{pageNum}")
+    @GetMapping("/admin/users/{pageNumber}")
     public String showAdminPage(@AuthenticationPrincipal UserDetailsImpl authUser,
-                                @PathVariable int pageNum,
+                                @PathVariable int pageNumber,
                                 @RequestParam(defaultValue = "username") String sortField,
                                 @RequestParam(defaultValue = "true") String sortAsc,
                                 @RequestParam(defaultValue = "All") String checkedRole,
+                                @RequestParam(required = false) String keyword,
                                 Model model) {
         model.addAttribute("loginedUser", userService.findByUsername(authUser.getUsername()));
-
-        List<String> roles = new ArrayList<>();
-        roles.add("All");
-        roleService.findAll().forEach(role -> roles.add(role.getName()));
-        model.addAttribute("roles", roles);
-        model.addAttribute("checkedRole", checkedRole);
 
         Sort sort = sortAsc.equals("true")
                 ? Sort.by(sortField).ascending()
                 : Sort.by(sortField).descending();
-        Pageable pageable = PageRequest.of(pageNum - 1, pageSize, sort);
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
 
         Page<User> page;
-        if (checkedRole.equals("All")) {
-            page = userService.findAll(pageable);
+        if (keyword == null) {
+            if (checkedRole.equals("All")) {
+                page = userService.findAll(pageable);
+            } else {
+                page = userService.findAllWithRoles(getCheckedRoles(checkedRole), pageable);
+            }
         } else {
-            Set<Role> rol = new HashSet<>();
-            rol.add(roleService.findByName(checkedRole));
-            page = userService.findAllWithRoles(rol, pageable);
+            model.addAttribute("keyword", keyword);
+            if (checkedRole.equals("All")) {
+                page = userService.searchAll(keyword.toLowerCase(), pageable);
+            } else {
+                page = userService.searchAllWithRoles(keyword.toLowerCase(), getCheckedRoles(checkedRole), pageable);
+            }
         }
 
         model.addAttribute("users", page.getContent());
-        model.addAttribute("currentPage", pageNum);
+        model.addAttribute("currentPage", pageNumber);
         model.addAttribute("totalPages", page.getTotalPages());
 
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortAsc", sortAsc);
 
-        log.info("Show adminPage for user with id '{}', pageNumber = '{}', sortField = '{}', sortAsc = '{}', checkedRole = '{}'",
-                authUser.getId(),
-                pageNum,
-                sortField,
-                sortAsc,
-                checkedRole);
+        model.addAttribute("roles", getAllRoleNames());
+        model.addAttribute("checkedRole", checkedRole);
+
+        log.info("Show adminPage for user with id '{}', pageNumber = '{}', sortField = '{}', sortAsc = '{}', checkedRole = '{}', keyword = '{}'",
+                authUser.getId(), pageNumber, sortField, sortAsc, checkedRole, keyword);
 
         return "adminPage";
+    }
+
+    private Set<Role> getCheckedRoles(String checkedRole) {
+        Set<Role> checkedRoles = new HashSet<>();
+        checkedRoles.add(roleService.findByName(checkedRole));
+        return checkedRoles;
+    }
+
+    private List<String> getAllRoleNames() {
+        List<String> roles = new ArrayList<>();
+        roles.add("All");
+        roleService.findAll().forEach(role -> roles.add(role.getName()));
+        return roles;
     }
 
 }
