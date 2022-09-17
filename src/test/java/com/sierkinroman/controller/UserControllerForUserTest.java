@@ -80,7 +80,7 @@ class UserControllerForUserTest {
     @WithUserDetails(value = "user10")
     public void testIncorrectUpdate() throws Exception {
         UserEditDto userEditDto = new UserEditDto(userService.findByUsername("user10"));
-        userEditDto.setEmail("user2@gmail.com");
+        userEditDto.setEmail("user02@gmail.com");
 
         this.mockMvc.perform(post("/user/edit").flashAttr("userEditDto", userEditDto).with(csrf()))
                 .andExpect(status().isOk())

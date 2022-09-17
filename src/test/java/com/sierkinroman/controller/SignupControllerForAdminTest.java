@@ -82,7 +82,7 @@ class SignupControllerForAdminTest {
 
     @Test
     public void testInvalidAddUser() throws Exception {
-        User persistedUser = userService.findByUsername("user1");
+        User persistedUser = userService.findByUsername("user01");
         UserSignupDto userSignupDto = new UserSignupDto(persistedUser.getUsername(),
                 "123456",
                 "1234567",

@@ -70,7 +70,7 @@ public class IndexControllerTest {
                 .andExpect(request().attribute("sortField", "username"))
                 .andExpect(request().attribute("sortAsc", "false"))
                 .andExpect(xpath("/html/body/table").exists())
-                .andExpect(xpath("/html/body/table/tr[2]/td[1]").string("user9"));
+                .andExpect(xpath("/html/body/table/tr[2]/td[1]").string("user49"));
     }
 
 }

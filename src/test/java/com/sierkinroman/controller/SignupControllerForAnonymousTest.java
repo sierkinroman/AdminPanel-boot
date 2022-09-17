@@ -66,12 +66,12 @@ class SignupControllerForAnonymousTest {
 
     @Test
     public void testInvalidSignup() throws Exception {
-        UserSignupDto userSignupDto = new UserSignupDto("user1",
+        UserSignupDto userSignupDto = new UserSignupDto("user01",
                 "123456",
                 "1234567",
-                "user1@gmail.com",
-                "User1",
-                "UserLN1",
+                "user01@gmail.com",
+                "User01",
+                "UserLN01",
                 true,
                 null);
         this.mockMvc.perform(post("/signup").flashAttr("userSignupDto", userSignupDto).with(csrf()))

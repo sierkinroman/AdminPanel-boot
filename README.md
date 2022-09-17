@@ -30,7 +30,7 @@ To log in as *Admin*:<br/>
 username and password: **admin**
 
 To log in as *default User*:<br/>
-username and password: **user1** or (**user10-user49**, user1-user9 is blocked)
+username and password: **user10** or (**user11-user49**, user01-user09 is disabled)
 
 Or to log in your *own account* type your credentials.
 

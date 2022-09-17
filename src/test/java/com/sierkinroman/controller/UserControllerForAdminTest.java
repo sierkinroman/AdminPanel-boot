@@ -251,7 +251,7 @@ class UserControllerForAdminTest {
     @Test
     @WithUserDetails(value = "admin")
     public void testCorrectEnable() throws Exception {
-        User user2 = userService.findByUsername("user2");
+        User user2 = userService.findByUsername("user02");
         assertThat(user2.isEnabled()).isFalse();
         UserEditDto enabledEditDto = getUserEditDto(user2, true);
 
@@ -262,7 +262,7 @@ class UserControllerForAdminTest {
                 .andExpect(authenticated().withRoles("ADMIN"))
                 .andExpect(redirectedUrl(getRefererUrl()));
 
-        assertThat(userService.findByUsername("user2").isEnabled()).isTrue();
+        assertThat(userService.findByUsername("user02").isEnabled()).isTrue();
     }
 
     @Test
