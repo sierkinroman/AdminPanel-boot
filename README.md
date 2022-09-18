@@ -9,10 +9,11 @@ On starting application, the database is initialized with default accounts.
 
 ### Some features
 - Last enabled Admin can't delete himself
-- Last enabled Admin can't change self role to non Admin
+- Last enabled Admin can't change self role to non-Admin
 - Last enabled Admin can't disable self
 - After an authorized user deletes himself, he is automatically logged out
-- If Admin changes self role to non Admin, he doesn't have access to adminPanel
+- If Admin changes self role to non-Admin, he doesn't have access to adminPanel
+- Searching, pagination, sorting
 
 ## Requirements
 - JDK 8
@@ -30,7 +31,7 @@ To log in as *Admin*:<br/>
 username and password: **admin**
 
 To log in as *default User*:<br/>
-username and password: **user10** or (**user11-user49**, user01-user09 is disabled)
+username and password: **user10** or (**user11-user49**, user01-user09 are disabled)
 
 Or to log in your *own account* type your credentials.
 
