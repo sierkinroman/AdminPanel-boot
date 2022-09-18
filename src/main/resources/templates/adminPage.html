@@ -74,7 +74,7 @@
         </th>
         <th class="table_header">Actions</th>
     </tr>
-    <tr th:each="user : ${users}">
+    <tr th:if="${users}" th:each="user : ${users}">
         <td class="cell" th:text="${user.username}">username</td>
         <td class="cell" th:text="${user.email}">email</td>
         <td class="cell" th:text="${user.firstName}">firstName</td>
@@ -92,6 +92,15 @@
             <a th:href="@{/admin/{id}/edit(id=${user.id})}">Edit</a>
             <button class="deleteBtn" th:name="${user.id}">Delete</button>
         </td>
+    </tr>
+    <tr th:if="${users.size()} == 0">
+        <td class="cell">No data</td>
+        <td class="cell">No data</td>
+        <td class="cell">No data</td>
+        <td class="cell">No data</td>
+        <td class="cell">No data</td>
+        <td class="cell roles_cell">No data</td>
+        <td class="cell">No data</td>
     </tr>
 </table>
 
