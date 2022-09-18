@@ -104,7 +104,7 @@
     </tr>
 </table>
 
-<div class="pagination">
+<div th:if="${totalPages} > 1" class="pagination">
     <a th:if="${currentPage > 1}" th:href="@{/admin/users/1(sortField=${sortField}, sortAsc=${sortAsc}, checkedRole=${checkedRole}, keyword=${keyword})}"
        class="page_link">&lt;&lt;</a>
     <a th:if="${currentPage > 1}"
