@@ -29,7 +29,7 @@ import java.util.Set;
 @EqualsAndHashCode(exclude = {"id"}, doNotUseGetters = true)
 @ToString(exclude = {"id"}, doNotUseGetters = true)
 @Entity
-@Table(name = "user")
+@Table(name = "usr")
 public class User {
 
     @Id
