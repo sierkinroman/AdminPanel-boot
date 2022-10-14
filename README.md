@@ -15,6 +15,11 @@ On starting application, the database is initialized with default accounts.
 - If Admin changes self role to non-Admin, he doesn't have access to adminPanel
 - Searching, pagination, sorting
 
+## Deployed
+The application is deployed on Heroku. 
+
+Here is the link: https://admin-panel-boot.herokuapp.com/
+
 ## Requirements
 - JDK 8
 
